@@ -18,7 +18,7 @@
 #include <err.h>
 #include <perfmon/pfmlib.h>
 #include <inttypes.h>
-
+#include "char_replace.h"
 
 
 int main(int argc, char** argv) {
@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 
     FILE* fp;
     char* line = NULL;
-    uint32_t len = 0;
+    uint64_t len = 0;
     int32_t read;
 
     fp = fopen("LISTOFEVENTS", "r");
@@ -38,53 +38,40 @@ int main(int argc, char** argv) {
         return -1;
     }
 
+    ret = pfm_initialize();
+    if (ret != PFM_SUCCESS)
+        errx(1, "cannot initialize library %s", pfm_strerror(ret));
 
-
-/*
-for(i = 0; i < argc; i++)
-  printf("%s%d\n", argv[i], i);
-*/
-
-//ret = pfm_find_event(argv[1]);
-//printf("\nLibrary version: %d\n", PFMLIB_MAJ_VERSION(pfm_get_version()));
-
-ret = pfm_initialize();
-if (ret != PFM_SUCCESS)
-   errx(1, "cannot initialize library %s", pfm_strerror(ret));
-
-memset(&raw, 0, sizeof(raw));
-
+    memset(&raw, 0, sizeof(raw));
 
     while((read = getline(&line, &len, fp)) != -1) {
 
-    memset(&raw, 0, sizeof(raw));
+        memset(&raw, 0, sizeof(raw));
 
         //printf("%d\n",read);
         line[(read -1)] = '\0';
         event = line;
-        printf("\t\t\t//%s\n", event);
 
+        //printf("\t\t\t//%s\n", event);
 
-ret = pfm_get_os_event_encoding(event, PFM_PLM3, PFM_OS_NONE, &raw);
-if (ret != PFM_SUCCESS)
+        ret = pfm_get_os_event_encoding(event, PFM_PLM3, PFM_OS_NONE, &raw);
+        if (ret != PFM_SUCCESS)
   // err(1, " cannot get encoding %s", pfm_strerror(ret));
-    printf("gen_codes can't get encoding %s\n",  pfm_strerror(ret));
-else {
+            printf("gen_codes can't get encoding %s\n",  pfm_strerror(ret));
+        else {
+            replace_char(line, '.', '_');
+            printf("\t\tcase\tPAPI_%s\t:\n", line);
+            for(i=0; i < raw.count; i++)
+                printf("\t\t\tpe.config=0x%"PRIx64"\n", raw.codes[i]);
+            printf("\t\t\tbreak;\n");
+        }
 
-for(i=0; i < raw.count; i++)
-   printf("\t\t\tpe.config=0x%"PRIx64"\n", raw.codes[i]);
-   printf("\t\t\tbreak;\n");
-}
+    }
 
-}
+    fclose(fp);
+    if(line)
+        free(line);
+    free(raw.codes);
 
-fclose(fp);
-if(line)
-    free(line);
-free(raw.codes);
-
-return 0;
-
-
-
+    return 0;
 }

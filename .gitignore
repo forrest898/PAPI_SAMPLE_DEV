@@ -4,3 +4,4 @@ PAPI_sample
 gen_codes
 print_record_sample.c
 gen_defines
+*.o

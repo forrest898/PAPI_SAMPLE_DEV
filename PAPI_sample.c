@@ -29,7 +29,7 @@
 #define SAMPLE_FREQUENCY 100000
 
 static void our_handler(int signum, siginfo_t *info, void *uc) {
-    /*
+/*
 	int ret;
 
 	int fd = info->si_fd;
@@ -42,7 +42,7 @@ static void our_handler(int signum, siginfo_t *info, void *uc) {
 	//	NULL, /*validate */
 	//	quiet,
 	//	NULL, /* events read */
-/*		RAW_NONE);
+		/*RAW_NONE);
 
 	count_total++;
 
@@ -107,46 +107,127 @@ int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
   /* Prototype for Skylake machines */
 
     switch(EventCode) {
-        case PAPI_DSB_MISS :
-            pe.config = 0x5301c2;
-            break;
-        case PAPI_L1INS_MISS :
-            pe.config = 0x5301c2;
-            break;
-        case PAPI_L2INS_MISS :
-            pe.config = 0x5301c2;
-            break;
-        case PAPI_ITLB_MISS :
-            pe.config = 0x5301c2;
-            break;
-        case PAPI_ISTLB_MISS :
-            pe.config = 0x5301c2;
-            break;
-        case PAPI_ISTLB_MISS_LOADS :
-            pe.config = 0x5301c2;
-            break;
-        case PAPI_ISTLB_MISS_STORES :
-            pe.config = 0x5301c2;
-            break;
-        case PAPI_LOCK_LOADS :
-            pe.config = 0x5301c2;
-            break;
-        case PAPI_SPLIT_LOADS  :
-            pe.config = 0x5301c2;
-            break;
-        case PAPI_SPLIT_STORES      :
-            pe.config = 0x5301c2;
-            break;
-        case PAPI_ALL_LOADS         :
-            pe.config = 0x5301c2;
-            break;
-        case PAPI_ALL_STORES        :
-            pe.config = 0x5301c2;
-            break;
+    /*
+    	case	PAPI_BR_INST_RETIRED.ALL_BRANCHES	:
+			pe.config=0x5100c4
+			break;
+		case	PAPI_BR_INST_RETIRED.CONDITIONAL	:
+			pe.config=0x5101c4
+			break;
+		case	PAPI_BR_INST_RETIRED.FAR_BRANCH	:
+			pe.config=0x5140c4
+			break;
+		case	PAPI_BR_INST_RETIRED.NEAR_CALL	:
+			pe.config=0x5102c4
+			break;
+		case	PAPI_BR_INST_RETIRED.NEAR_RETURN	:
+			pe.config=0x5108c4
+			break;
+		case	PAPI_BR_INST_RETIRED.NEAR_TAKEN	:
+			pe.config=0x5120c4
+			break;
+		case	PAPI_BR_MISP_RETIRED.ALL_BRANCHES	:
+			pe.config=0x5100c5
+			break;
+		case	PAPI_BR_MISP_RETIRED.CONDITIONAL	:
+			pe.config=0x5101c5
+			break;
+		case	PAPI_BR_MISP_RETIRED.NEAR_CALL	:
+			pe.config=0x5102c5
+			break;
+		case	PAPI_BR_MISP_RETIRED.NEAR_TAKEN	:
+			pe.config=0x5120c5
+			break;
+		case	PAPI_FRONTEND_RETIRED.DSB_MISS	:
+			pe.config=0x5101c6
+			pe.config2=0x11
+			break;
+		case	PAPI_FRONTEND_RETIRED.ITLB_MISS	:
+			pe.config=0x5101c6
+			pe.config2=0x14
+			break;
+		case	PAPI_FRONTEND_RETIRED.STLB_MISS	:
+			pe.config=0x5101c6
+			pe.config2=0x15
+			break;
+		case	PAPI_FRONTEND_RETIRED.L1I_MISS	:
+			pe.config=0x5101c6
+			pe.config2=0x12
+			break;
+		case	PAPI_FRONTEND_RETIRED.L2_MISS	:
+			pe.config=0x5101c6
+			pe.config2=0x13
+			break;
+		case	PAPI_MEM_INST_RETIRED.STLB_MISS_LOADS	:
+			pe.config=0x5111d0
+			break;
+		case	PAPI_MEM_INST_RETIRED.STLB_MISS_STORES	:
+			pe.config=0x5112d0
+			break;
+		case	PAPI_MEM_INST_RETIRED.LOCK_LOADS	:
+			pe.config=0x5121d0
+			break;
+		case	PAPI_MEM_INST_RETIRED.SPLIT_LOADS	:
+			pe.config=0x5141d0
+			break;
+		case	PAPI_MEM_INST_RETIRED.SPLIT_STORES	:
+			pe.config=0x5142d0
+			break;
+		case	PAPI_MEM_INST_RETIRED.ALL_LOADS	:
+			pe.config=0x5181d0
+			break;
+		case	PAPI_MEM_INST_RETIRED.ALL_STORES	:
+			pe.config=0x5182d0
+			break;
+		case	PAPI_HLE_RETIRED.ABORTED	:
+			pe.config=0x5104c8
+			break;
+		case	PAPI_INST_RETIRED.TOTAL_CYCLES	:
+			pe.config=0xad101c0
+			break;
+		case	PAPI_MEM_LOAD_L3_HIT_RETIRED.XSNP_HIT	:
+			pe.config=0x5102d2
+			break;
+		case	PAPI_MEM_LOAD_L3_HIT_RETIRED.XSNP_HITM	:
+			pe.config=0x5104d2
+			break;
+		case	PAPI_MEM_LOAD_L3_HIT_RETIRED.XSNP_MISS	:
+			pe.config=0x5101d2
+			break;
+		case	PAPI_MEM_LOAD_L3_HIT_RETIRED.XSNP_NONE	:
+			pe.config=0x5108d2
+			break;
+		case	PAPI_MEM_LOAD_MISC_RETIRED.UC	:
+			pe.config=0x5104d4
+			break;
+		case	PAPI_MEM_LOAD_RETIRED.FB_HIT	:
+			pe.config=0x5140d1
+			break;
+		case	PAPI_MEM_LOAD_RETIRED.L1_HIT	:
+			pe.config=0x5101d1
+			break;
+		case	PAPI_MEM_LOAD_RETIRED.L1_MISS	:
+			pe.config=0x5108d1
+			break;
+		case	PAPI_MEM_LOAD_RETIRED.L2_HIT	:
+			pe.config=0x5102d1
+			break;
+		case	PAPI_MEM_LOAD_RETIRED.L2_MISS	:
+			pe.config=0x5110d1
+			break;
+		case	PAPI_MEM_LOAD_RETIRED.L3_HIT	:
+			pe.config=0x5104d1
+			break;
+		case	PAPI_MEM_LOAD_RETIRED.L3_MISS	:
+			pe.config=0x5120d1
+			break;
+		case	PAPI_RTM_RETIRED.ABORTED	:
+			pe.config=0x5104c9
+			break;
         default:
             printf("EventCode not found in PEBS/IBS event! Enter a valid code!");
             return -1;
-            break;
+            break;*/
   }
 
 

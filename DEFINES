@@ -47,6 +47,3 @@
 #define PAPI_MEM_LOAD_RETIRED.L3_HIT	47
 #define PAPI_MEM_LOAD_RETIRED.L3_MISS	48
 #define PAPI_RTM_RETIRED.ABORTED	49
-
-int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
-   int sample_period, char filename);
