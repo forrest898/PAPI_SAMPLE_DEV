@@ -9,6 +9,7 @@ PROGRAM_LIST = \
 	gen_codes \
 	nameevents \
 	PAPI_sample \
+	gen_defines \
 
 default: $(PROGRAM_LIST)
 all: default

@@ -23,6 +23,7 @@
 //#include "instructions_testcode.h"
 
 #include "parse_record.h"
+#include "PAPI_sample.h"
 
 #define MMAP_DATA_SIZE 8
 #define SAMPLE_FREQUENCY 100000
@@ -92,7 +93,7 @@ int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
  /* MEM_UOPS_RETIRED:ALL_STORES */
     //  pe.config = 0x5301c2;
 
-    pe.sample_period=SAMPLE_FREQUENCY;
+    pe.sample_period=sample_period;
     pe.sample_type=sample_type;
 
     pe.read_format=read_format;
@@ -104,7 +105,7 @@ int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
     pe.precise_ip=1;
 
   /* Prototype for Skylake machines */
-    /*
+
     switch(EventCode) {
         case PAPI_DSB_MISS :
             pe.config = 0x5301c2;
@@ -142,13 +143,12 @@ int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
         case PAPI_ALL_STORES        :
             pe.config = 0x5301c2;
             break;
-        case default:
-            printf("EventCode not found in PEBS/IBS event! Enter a
-                valid code!");
+        default:
+            printf("EventCode not found in PEBS/IBS event! Enter a valid code!");
             return -1;
             break;
   }
-        */
+
 
 
 

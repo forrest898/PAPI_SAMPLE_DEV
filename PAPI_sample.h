@@ -11,11 +11,5 @@
 #define PAPI_ALL_LOADS    11
 #define PAPI_ALL_STORES   12
 
-int PAPI_sample_init( int Eventset,
-                      int EventCode,
-                      int sample_type,
-                      int sample_period,
-                      int threshold,
-                      void *buffer,
-                      int buffer_size,
-                      PAPI_sample_full_callback handler);
+int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
+   int sample_period, char filename);

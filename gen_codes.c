@@ -25,22 +25,19 @@ int main(int argc, char** argv) {
 
     pfm_pmu_encode_arg_t raw;
     int ret, i;
-    char *event = argv[1];
+    char *event = "BR_INST_RETIRED.ALL_BRANCHES";
 
     FILE* fp;
     char* line = NULL;
     uint32_t len = 0;
     int32_t read;
 
-    fp = open("LISTOFEVENTS", "r");
+    fp = fopen("LISTOFEVENTS", "r");
     if(fp == NULL) {
         printf("Error opening list of events\n");
         return -1;
     }
 
-    while((read = getline(&line, &len, fp)) != -1) {
-        printf("%s", line);
-    }
 
 
 /*
@@ -57,14 +54,35 @@ if (ret != PFM_SUCCESS)
 
 memset(&raw, 0, sizeof(raw));
 
+
+    while((read = getline(&line, &len, fp)) != -1) {
+
+    memset(&raw, 0, sizeof(raw));
+
+        //printf("%d\n",read);
+        line[(read -1)] = '\0';
+        event = line;
+        printf("\t\t\t//%s\n", event);
+
+
 ret = pfm_get_os_event_encoding(event, PFM_PLM3, PFM_OS_NONE, &raw);
 if (ret != PFM_SUCCESS)
-   err(1, " cannot get encoding %s", pfm_strerror(ret));
+  // err(1, " cannot get encoding %s", pfm_strerror(ret));
+    printf("gen_codes can't get encoding %s\n",  pfm_strerror(ret));
+else {
 
 for(i=0; i < raw.count; i++)
-   printf("count[%d]=0x%"PRIx64"\n", i, raw.codes[i]);
+   printf("\t\t\tpe.config=0x%"PRIx64"\n", raw.codes[i]);
+   printf("\t\t\tbreak;\n");
+}
 
+}
+
+fclose(fp);
+if(line)
+    free(line);
 free(raw.codes);
+
 return 0;
 
 
