@@ -33,10 +33,15 @@ if(argc != 2) {
   printf("Enter a commmand to translate to hex!\n");
   return -1;
 }
+
+printf("\n%s\n", argv[1]);
 /*
 for(i = 0; i < argc; i++)
   printf("%s%d\n", argv[i], i);
 */
+
+//ret = pfm_find_event(argv[1]);
+//printf("\nLibrary version: %d\n", PFMLIB_MAJ_VERSION(pfm_get_version()));
 
 ret = pfm_initialize();
 if (ret != PFM_SUCCESS)

@@ -333,6 +333,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 
 	void *data_mmap=our_mmap+getpagesize();
 
+	
 	if (mmap_size==0) return 0;
 
 	if (control_page==NULL) {

@@ -1,0 +1,17 @@
+How to pick size of MMAP?
+
+7.1
+
+Basically just use parse_record but send all data to a file?
+	perf.data or other user specified file
+
+7.2
+
+User specifies a buffer which results are copied to.
+	- user must then have their own mmap_read? handle the data and exit 
+	- how large would the linux mmap be by default?
+	- follow a scheme like the papi_overflow function for initialization?
+
+Implementation similar to overflow handler?
+	write to buffer instead of to screen?
+	
