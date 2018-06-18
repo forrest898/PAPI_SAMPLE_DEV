@@ -27,6 +27,30 @@
 #define MMAP_DATA_SIZE 8
 #define SAMPLE_FREQUENCY 100000
 
+static void our_handler(int signum, siginfo_t *info, void *uc) {
+    /*
+	int ret;
+
+	int fd = info->si_fd;
+
+	ret=ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
+
+	prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
+		sample_type,read_format,
+		0, /* reg_mask */
+	//	NULL, /*validate */
+	//	quiet,
+	//	NULL, /* events read */
+/*		RAW_NONE);
+
+	count_total++;
+
+	ret=ioctl(fd, PERF_EVENT_IOC_REFRESH, 1);
+
+	(void) ret;
+*/
+}
+
 /* Base API for simple write-out results */
 int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
    int sample_period, char filename) {
@@ -44,11 +68,10 @@ int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
 
      //quiet=test_quiet();
 
-     if (!quiet) printf("This begins the implementation of complex sampling
-        with PAPI.\n");
+     if(!quiet) printf("This begins the implementation of complex sampling with PAPI.\n");
 
     memset(&sa, 0, sizeof(struct sigaction));
-    sa.sa_sigaction = handler;
+    sa.sa_sigaction = our_handler;
     sa.sa_flags = SA_SIGINFO;
 
     if (sigaction( SIGIO, &sa, NULL) < 0) {
@@ -81,6 +104,7 @@ int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
     pe.precise_ip=1;
 
   /* Prototype for Skylake machines */
+    /*
     switch(EventCode) {
         case PAPI_DSB_MISS :
             pe.config = 0x5301c2;
@@ -124,6 +148,7 @@ int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
             return -1;
             break;
   }
+        */
 
 
 
@@ -137,5 +162,8 @@ int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
 
 
 
+}
+
+int main(int argc, char** argv) {
 
 }

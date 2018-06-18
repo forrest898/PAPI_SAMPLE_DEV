@@ -1,2 +1,5 @@
 nameevent
 a.out
+PAPI_sample
+gen_codes
+print_record_sample.c
