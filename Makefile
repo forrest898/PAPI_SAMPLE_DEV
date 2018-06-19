@@ -12,7 +12,7 @@ PROGRAM_LIST = \
 	PAPI_sample \
 	gen_defines \
 
-all: gen_codes nameevents gen_defines
+all: gen_codes nameevents gen_defines gen_list
 
 gen_codes:	gen_codes.o char_replace.o
 			$(CC) -o gen_codes gen_codes.o char_replace.o \
@@ -25,6 +25,10 @@ nameevents: nameevents.o
 gen_defines:	gen_defines.o
 				$(CC) -o gen_defines gen_defines.o char_replace.o \
 				$(LIBS)
+
+gen_list:	gen_list.o
+			$(CC) -o gen_list gen_list.o char_replace.o \
+			$(LIBS)
 
 #$(PROGRAM_LIST): %: %.c
 #	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
@@ -43,6 +47,9 @@ PAPI_sample.o: PAPI_sample.c PAPI_sample.h
 
 gen_defines.o: gen_defines.c
 	$(CC) $(CFLAGS) -c gen_defines.c
+
+gen_list.o: gen_list.c
+	$(CC) $(CFLAGS) -c gen_list.c
 
 clean:
 	-rm -f *.o

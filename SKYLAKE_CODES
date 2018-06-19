@@ -1,50 +1,50 @@
-		case	PAPI_BR_INST_RETIRED.ALL_BRANCHES	:
+		case	PAPI_BR_INST_RETIRED_ALL_BRANCHES	:
 			pe.config=0x5100c4
 			break;
-		case	PAPI_BR_INST_RETIRED.CONDITIONAL	:
+		case	PAPI_BR_INST_RETIRED_CONDITIONAL	:
 			pe.config=0x5101c4
 			break;
-		case	PAPI_BR_INST_RETIRED.FAR_BRANCH	:
+		case	PAPI_BR_INST_RETIRED_FAR_BRANCH	:
 			pe.config=0x5140c4
 			break;
-		case	PAPI_BR_INST_RETIRED.NEAR_CALL	:
+		case	PAPI_BR_INST_RETIRED_NEAR_CALL	:
 			pe.config=0x5102c4
 			break;
-		case	PAPI_BR_INST_RETIRED.NEAR_RETURN	:
+		case	PAPI_BR_INST_RETIRED_NEAR_RETURN	:
 			pe.config=0x5108c4
 			break;
-		case	PAPI_BR_INST_RETIRED.NEAR_TAKEN	:
+		case	PAPI_BR_INST_RETIRED_NEAR_TAKEN	:
 			pe.config=0x5120c4
 			break;
-		case	PAPI_BR_MISP_RETIRED.ALL_BRANCHES	:
+		case	PAPI_BR_MISP_RETIRED_ALL_BRANCHES	:
 			pe.config=0x5100c5
 			break;
-		case	PAPI_BR_MISP_RETIRED.CONDITIONAL	:
+		case	PAPI_BR_MISP_RETIRED_CONDITIONAL	:
 			pe.config=0x5101c5
 			break;
-		case	PAPI_BR_MISP_RETIRED.NEAR_CALL	:
+		case	PAPI_BR_MISP_RETIRED_NEAR_CALL	:
 			pe.config=0x5102c5
 			break;
-		case	PAPI_BR_MISP_RETIRED.NEAR_TAKEN	:
+		case	PAPI_BR_MISP_RETIRED_NEAR_TAKEN	:
 			pe.config=0x5120c5
 			break;
-		case	PAPI_FRONTEND_RETIRED.DSB_MISS	:
+		case	PAPI_FRONTEND_RETIRED_DSB_MISS	:
 			pe.config=0x5101c6
 			pe.config=0x11
 			break;
-		case	PAPI_FRONTEND_RETIRED.ITLB_MISS	:
+		case	PAPI_FRONTEND_RETIRED_ITLB_MISS	:
 			pe.config=0x5101c6
 			pe.config=0x14
 			break;
-		case	PAPI_FRONTEND_RETIRED.STLB_MISS	:
+		case	PAPI_FRONTEND_RETIRED_STLB_MISS	:
 			pe.config=0x5101c6
 			pe.config=0x15
 			break;
-		case	PAPI_FRONTEND_RETIRED.L1I_MISS	:
+		case	PAPI_FRONTEND_RETIRED_L1I_MISS	:
 			pe.config=0x5101c6
 			pe.config=0x12
 			break;
-		case	PAPI_FRONTEND_RETIRED.L2_MISS	:
+		case	PAPI_FRONTEND_RETIRED_L2_MISS	:
 			pe.config=0x5101c6
 			pe.config=0x13
 			break;
@@ -60,69 +60,69 @@ gen_codes can't get encoding invalid event attribute
 gen_codes can't get encoding invalid event attribute
 gen_codes can't get encoding invalid event attribute
 gen_codes can't get encoding invalid event attribute
-		case	PAPI_MEM_INST_RETIRED.STLB_MISS_LOADS	:
+		case	PAPI_MEM_INST_RETIRED_STLB_MISS_LOADS	:
 			pe.config=0x5111d0
 			break;
-		case	PAPI_MEM_INST_RETIRED.STLB_MISS_STORES	:
+		case	PAPI_MEM_INST_RETIRED_STLB_MISS_STORES	:
 			pe.config=0x5112d0
 			break;
-		case	PAPI_MEM_INST_RETIRED.LOCK_LOADS	:
+		case	PAPI_MEM_INST_RETIRED_LOCK_LOADS	:
 			pe.config=0x5121d0
 			break;
-		case	PAPI_MEM_INST_RETIRED.SPLIT_LOADS	:
+		case	PAPI_MEM_INST_RETIRED_SPLIT_LOADS	:
 			pe.config=0x5141d0
 			break;
-		case	PAPI_MEM_INST_RETIRED.SPLIT_STORES	:
+		case	PAPI_MEM_INST_RETIRED_SPLIT_STORES	:
 			pe.config=0x5142d0
 			break;
-		case	PAPI_MEM_INST_RETIRED.ALL_LOADS	:
+		case	PAPI_MEM_INST_RETIRED_ALL_LOADS	:
 			pe.config=0x5181d0
 			break;
-		case	PAPI_MEM_INST_RETIRED.ALL_STORES	:
+		case	PAPI_MEM_INST_RETIRED_ALL_STORES	:
 			pe.config=0x5182d0
 			break;
-		case	PAPI_HLE_RETIRED.ABORTED	:
+		case	PAPI_HLE_RETIRED_ABORTED	:
 			pe.config=0x5104c8
 			break;
-		case	PAPI_INST_RETIRED.TOTAL_CYCLES	:
+		case	PAPI_INST_RETIRED_TOTAL_CYCLES	:
 			pe.config=0xad101c0
 			break;
-		case	PAPI_MEM_LOAD_L3_HIT_RETIRED.XSNP_HIT	:
+		case	PAPI_MEM_LOAD_L3_HIT_RETIRED_XSNP_HIT	:
 			pe.config=0x5102d2
 			break;
-		case	PAPI_MEM_LOAD_L3_HIT_RETIRED.XSNP_HITM	:
+		case	PAPI_MEM_LOAD_L3_HIT_RETIRED_XSNP_HITM	:
 			pe.config=0x5104d2
 			break;
-		case	PAPI_MEM_LOAD_L3_HIT_RETIRED.XSNP_MISS	:
+		case	PAPI_MEM_LOAD_L3_HIT_RETIRED_XSNP_MISS	:
 			pe.config=0x5101d2
 			break;
-		case	PAPI_MEM_LOAD_L3_HIT_RETIRED.XSNP_NONE	:
+		case	PAPI_MEM_LOAD_L3_HIT_RETIRED_XSNP_NONE	:
 			pe.config=0x5108d2
 			break;
-		case	PAPI_MEM_LOAD_MISC_RETIRED.UC	:
+		case	PAPI_MEM_LOAD_MISC_RETIRED_UC	:
 			pe.config=0x5104d4
 			break;
-		case	PAPI_MEM_LOAD_RETIRED.FB_HIT	:
+		case	PAPI_MEM_LOAD_RETIRED_FB_HIT	:
 			pe.config=0x5140d1
 			break;
-		case	PAPI_MEM_LOAD_RETIRED.L1_HIT	:
+		case	PAPI_MEM_LOAD_RETIRED_L1_HIT	:
 			pe.config=0x5101d1
 			break;
-		case	PAPI_MEM_LOAD_RETIRED.L1_MISS	:
+		case	PAPI_MEM_LOAD_RETIRED_L1_MISS	:
 			pe.config=0x5108d1
 			break;
-		case	PAPI_MEM_LOAD_RETIRED.L2_HIT	:
+		case	PAPI_MEM_LOAD_RETIRED_L2_HIT	:
 			pe.config=0x5102d1
 			break;
-		case	PAPI_MEM_LOAD_RETIRED.L2_MISS	:
+		case	PAPI_MEM_LOAD_RETIRED_L2_MISS	:
 			pe.config=0x5110d1
 			break;
-		case	PAPI_MEM_LOAD_RETIRED.L3_HIT	:
+		case	PAPI_MEM_LOAD_RETIRED_L3_HIT	:
 			pe.config=0x5104d1
 			break;
-		case	PAPI_MEM_LOAD_RETIRED.L3_MISS	:
+		case	PAPI_MEM_LOAD_RETIRED_L3_MISS	:
 			pe.config=0x5120d1
 			break;
-		case	PAPI_RTM_RETIRED.ABORTED	:
+		case	PAPI_RTM_RETIRED_ABORTED	:
 			pe.config=0x5104c9
 			break;
