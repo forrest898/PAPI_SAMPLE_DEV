@@ -58,4 +58,8 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
 struct perf_event_attr setup_perf(int EventCode, int sample_type,
     int sample_period, int firstEvent);
 
+int PAPI_sample_start(int Eventset);
+
+int PAPI_sample_stop(int Eventset);
+
 #endif

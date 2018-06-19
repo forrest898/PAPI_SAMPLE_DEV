@@ -32,6 +32,7 @@
 
 //static int32_t init = 0;
 static int32_t quiet=0;
+static int* fds = NULL;
 
 
 void *our_mmap;
@@ -49,14 +50,15 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 
 	ret=ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
 
+    /*
 	prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
 		sample_type,read_format,
 		0, /* reg_mask */
-		NULL, /*validate */
-		quiet,
-		NULL, /* events read */
-		RAW_NONE);
-
+//		NULL, /*validate */
+///		quiet,
+//		NULL, /* events read */
+//		RAW_NONE);
+    printf("I got interrupted\n");
 	//count_total++;
 
 	ret=ioctl(fd, PERF_EVENT_IOC_REFRESH, 1);
@@ -70,7 +72,7 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
                         int sample_type, int sample_period, char filename) {
 
     int ret, i, firstEvent;
-    int* fds;
+    //int* fds;
     int mmap_pages=1+MMAP_DATA_SIZE;
     int quiet = 0;
     int read_format;
@@ -82,6 +84,17 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
      //quiet=test_quiet();
     fds = (int *)malloc(sizeof(int)*NumEvents);
     firstEvent = 1;
+
+    if(!quiet) printf("This begins the implementation of complex sampling with PAPI.\n");
+
+    memset(&sa, 0, sizeof(struct sigaction));
+    sa.sa_sigaction = PAPI_sample_handler;
+    sa.sa_flags = SA_SIGINFO;
+
+    if (sigaction( SIGIO, &sa, NULL) < 0) {
+        fprintf(stderr,"Error setting up signal handler\n");
+        exit(1);
+    }
 
     for(i = 0; i < NumEvents; i++) {
 
@@ -111,17 +124,6 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
             firstEvent = 0;
     }
 
-    if(!quiet) printf("This begins the implementation of complex sampling with PAPI.\n");
-
-    memset(&sa, 0, sizeof(struct sigaction));
-    sa.sa_sigaction = PAPI_sample_handler;
-    sa.sa_flags = SA_SIGINFO;
-
-    if (sigaction( SIGIO, &sa, NULL) < 0) {
-        fprintf(stderr,"Error setting up signal handler\n");
-        exit(1);
-    }
-
 
 	our_mmap=mmap(NULL, mmap_pages*getpagesize(),
 			PROT_READ|PROT_WRITE, MAP_SHARED, fds[0], 0);
@@ -133,9 +135,40 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
 	fcntl(fds[0], F_SETSIG, SIGIO);
 	fcntl(fds[0], F_SETOWN,getpid());
 
-
     return PAPI_OK;
 
+}
+
+int PAPI_sample_start(int Eventset) {
+
+    /* check to see if eventset is not null and valid first */
+    int ret;
+
+    if(fds[0] != NULL) {
+
+    	ioctl(fds[0], PERF_EVENT_IOC_RESET, 0);
+
+    	ret=ioctl(fds[0], PERF_EVENT_IOC_ENABLE,0);
+
+    	if (ret<0) {
+    		if (!quiet) {
+    			fprintf(stderr,"Error with PERF_EVENT_IOC_ENABLE "
+    					"of group leader: %d %s\n",
+    					errno,strerror(errno));
+    			exit(1);
+     		}
+    	}
+
+    }
+
+}
+
+int PAPI_sample_stop(int Eventset) {
+
+    int ret;
+
+    ret=ioctl(fds[0], PERF_EVENT_IOC_REFRESH,0);
+    printf("File ready for parsing\n");
 
 }
 
@@ -156,9 +189,10 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
     if(firstEvent != 0) {
 
         pe.sample_period=sample_period;
-        pe.sample_type=sample_type;
 
     }
+
+    pe.sample_type=sample_type;
 
     pe.read_format=read_format;
     pe.disabled=1;
