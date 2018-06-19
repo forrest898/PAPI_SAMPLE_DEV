@@ -20,6 +20,7 @@
 #include <inttypes.h>
 #include <papi.h>
 #include "papiStdEventDefs.h"
+#include "PAPI_sample.h"
 
 int main(int argc, char **argv) {
 

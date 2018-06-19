@@ -16,6 +16,7 @@
 #include <sys/ioctl.h>
 #include <asm/unistd.h>
 #include <sys/prctl.h>
+#include <papi.h>
 
 #include "perf_event.h"
 #include "test_utils.h"
@@ -25,54 +26,95 @@
 #include "parse_record.h"
 #include "PAPI_sample.h"
 
-#define MMAP_DATA_SIZE 8
-#define SAMPLE_FREQUENCY 100000
 
-static void our_handler(int signum, siginfo_t *info, void *uc) {
-/*
+#define MMAP_DATA_SIZE 8
+#define DEBUG 0
+
+//static int32_t init = 0;
+static int32_t quiet=0;
+
+
+void *our_mmap;
+//#define SAMPLE_FREQUENCY 100000
+
+static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
+
 	int ret;
 
 	int fd = info->si_fd;
+    int read_format = PERF_FORMAT_GROUP |
+        PERF_FORMAT_ID |
+        PERF_FORMAT_TOTAL_TIME_ENABLED |
+        PERF_FORMAT_TOTAL_TIME_RUNNING;
 
 	ret=ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
 
 	prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
 		sample_type,read_format,
 		0, /* reg_mask */
-	//	NULL, /*validate */
-	//	quiet,
-	//	NULL, /* events read */
-		/*RAW_NONE);
+		NULL, /*validate */
+		quiet,
+		NULL, /* events read */
+		RAW_NONE);
 
-	count_total++;
+	//count_total++;
 
 	ret=ioctl(fd, PERF_EVENT_IOC_REFRESH, 1);
 
 	(void) ret;
-*/
+
 }
 
 /* Base API for simple write-out results */
-int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
-   int sample_period, char filename) {
+int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
+                        int sample_type, int sample_period, char filename) {
 
-     int ret, i;
-     int fd;
-     int mmap_pages=1+MMAP_DATA_SIZE;
-     int quiet = 0;
-     int read_format;
+    int ret, i, firstEvent;
+    int* fds;
+    int mmap_pages=1+MMAP_DATA_SIZE;
+    int quiet = 0;
+    int read_format;
 
-     struct perf_event_attr pe;
-
-     struct sigaction sa;
-     char test_string[]="Testing Intel PEBS support...";
+    struct perf_event_attr pe;
+    struct sigaction sa;
+    char test_string[]="Testing Intel PEBS support...";
 
      //quiet=test_quiet();
+    fds = (int *)malloc(sizeof(int)*NumEvents);
+    firstEvent = 1;
 
-     if(!quiet) printf("This begins the implementation of complex sampling with PAPI.\n");
+    for(i = 0; i < NumEvents; i++) {
+
+        memset(&pe,0,sizeof(struct perf_event_attr));
+        pe = setup_perf(EventCodes[i], sample_type, sample_period, firstEvent);
+
+        if(firstEvent) {
+            fds[i] = perf_event_open(&pe,0,-1,-1,0);
+            if (fds[i]<0) {
+    			if (!quiet) {
+    				fprintf(stderr,"Error opening leader %s\n",
+    					strerror(errno));
+    			}
+    			//test_fail(test_string);
+    		}
+        }
+        else {
+            fds[i]=perf_event_open(&pe,0,-1,fds[0],0);
+        	if (fds[i]<0) {
+        		if (!quiet) fprintf(stderr,"Error opening %llx\n",pe.config);
+        		test_fail(test_string);
+        	}
+
+        }
+
+        if(i == 0)
+            firstEvent = 0;
+    }
+
+    if(!quiet) printf("This begins the implementation of complex sampling with PAPI.\n");
 
     memset(&sa, 0, sizeof(struct sigaction));
-    sa.sa_sigaction = our_handler;
+    sa.sa_sigaction = PAPI_sample_handler;
     sa.sa_flags = SA_SIGINFO;
 
     if (sigaction( SIGIO, &sa, NULL) < 0) {
@@ -80,21 +122,43 @@ int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
         exit(1);
     }
 
-    memset(&pe,0,sizeof(struct perf_event_attr));
-    read_format=PERF_FORMAT_GROUP |
+
+	our_mmap=mmap(NULL, mmap_pages*getpagesize(),
+			PROT_READ|PROT_WRITE, MAP_SHARED, fds[0], 0);
+
+	/* SIGIO must be asynchronous because perf will write to the mmap and continue
+	to count simultaneously */
+	fcntl(fds[0], F_SETFL, O_RDWR|O_NONBLOCK|O_ASYNC);
+	/* Associates our file descriptor with the appropriate signal */
+	fcntl(fds[0], F_SETSIG, SIGIO);
+	fcntl(fds[0], F_SETOWN,getpid());
+
+
+    return PAPI_OK;
+
+
+}
+
+struct perf_event_attr setup_perf(int EventCode, int sample_type,
+                                    int sample_period, int firstEvent) {
+
+    int read_format = PERF_FORMAT_GROUP |
         PERF_FORMAT_ID |
         PERF_FORMAT_TOTAL_TIME_ENABLED |
         PERF_FORMAT_TOTAL_TIME_RUNNING;
+    struct perf_event_attr pe;
+
+    memset(&pe,0,sizeof(struct perf_event_attr));
 
     pe.type=PERF_TYPE_RAW;
     pe.size=sizeof(struct perf_event_attr);
-      //pe.config=PERF_COUNT_HW_INSTRUCTIONS;
 
- /* MEM_UOPS_RETIRED:ALL_STORES */
-    //  pe.config = 0x5301c2;
+    if(firstEvent != 0) {
 
-    pe.sample_period=sample_period;
-    pe.sample_type=sample_type;
+        pe.sample_period=sample_period;
+        pe.sample_type=sample_type;
+
+    }
 
     pe.read_format=read_format;
     pe.disabled=1;
@@ -108,143 +172,127 @@ int PAPI_sample_init( int Eventset,int EventCode, int sample_type,
 
     switch(EventCode) {
         case	PAPI_BR_INST_RETIRED_ALL_BRANCHES	:
-			pe.config=0x5100c4
+			pe.config=0x5100c4;
 			break;
 		case	PAPI_BR_INST_RETIRED_CONDITIONAL	:
-			pe.config=0x5101c4
+			pe.config=0x5101c4;
 			break;
 		case	PAPI_BR_INST_RETIRED_FAR_BRANCH	:
-			pe.config=0x5140c4
+			pe.config=0x5140c4;
 			break;
 		case	PAPI_BR_INST_RETIRED_NEAR_CALL	:
-			pe.config=0x5102c4
+			pe.config=0x5102c4;
 			break;
 		case	PAPI_BR_INST_RETIRED_NEAR_RETURN	:
-			pe.config=0x5108c4
+			pe.config=0x5108c4;
 			break;
 		case	PAPI_BR_INST_RETIRED_NEAR_TAKEN	:
-			pe.config=0x5120c4
+			pe.config=0x5120c4;
 			break;
 		case	PAPI_BR_MISP_RETIRED_ALL_BRANCHES	:
-			pe.config=0x5100c5
+			pe.config=0x5100c5;
 			break;
 		case	PAPI_BR_MISP_RETIRED_CONDITIONAL	:
-			pe.config=0x5101c5
+			pe.config=0x5101c5;
 			break;
 		case	PAPI_BR_MISP_RETIRED_NEAR_CALL	:
-			pe.config=0x5102c5
+			pe.config=0x5102c5;
 			break;
 		case	PAPI_BR_MISP_RETIRED_NEAR_TAKEN	:
-			pe.config=0x5120c5
+			pe.config=0x5120c5;
 			break;
 		case	PAPI_FRONTEND_RETIRED_DSB_MISS	:
-			pe.config=0x5101c6
-			pe.config2=0x11
+			pe.config=0x5101c6;
+			pe.config2=0x11;
 			break;
 		case	PAPI_FRONTEND_RETIRED_ITLB_MISS	:
-			pe.config=0x5101c6
-			pe.config2=0x14
+			pe.config=0x5101c6;
+			pe.config2=0x14;
 			break;
 		case	PAPI_FRONTEND_RETIRED_STLB_MISS	:
-			pe.config=0x5101c6
-			pe.config2=0x15
+			pe.config=0x5101c6;
+			pe.config2=0x15;
 			break;
 		case	PAPI_FRONTEND_RETIRED_L1I_MISS	:
-			pe.config=0x5101c6
-			pe.config2=0x12
+			pe.config=0x5101c6;
+			pe.config2=0x12;
 			break;
 		case	PAPI_FRONTEND_RETIRED_L2_MISS	:
-			pe.config=0x5101c6
-			pe.config2=0x13
+			pe.config=0x5101c6;
+			pe.config2=0x13;
 			break;
 		case	PAPI_MEM_INST_RETIRED_STLB_MISS_LOADS	:
-			pe.config=0x5111d0
+			pe.config=0x5111d0;
 			break;
 		case	PAPI_MEM_INST_RETIRED_STLB_MISS_STORES	:
-			pe.config=0x5112d0
+			pe.config=0x5112d0;
 			break;
 		case	PAPI_MEM_INST_RETIRED_LOCK_LOADS	:
-			pe.config=0x5121d0
+			pe.config=0x5121d0;
 			break;
 		case	PAPI_MEM_INST_RETIRED_SPLIT_LOADS	:
-			pe.config=0x5141d0
+			pe.config=0x5141d0;
 			break;
 		case	PAPI_MEM_INST_RETIRED_SPLIT_STORES	:
-			pe.config=0x5142d0
+			pe.config=0x5142d0;
 			break;
 		case	PAPI_MEM_INST_RETIRED_ALL_LOADS	:
-			pe.config=0x5181d0
+			pe.config=0x5181d0;
 			break;
 		case	PAPI_MEM_INST_RETIRED_ALL_STORES	:
-			pe.config=0x5182d0
+			pe.config=0x5182d0;
 			break;
 		case	PAPI_HLE_RETIRED_ABORTED	:
-			pe.config=0x5104c8
+			pe.config=0x5104c8;
 			break;
 		case	PAPI_INST_RETIRED_TOTAL_CYCLES	:
-			pe.config=0xad101c0
+			pe.config=0xad101c0;
 			break;
 		case	PAPI_MEM_LOAD_L3_HIT_RETIRED_XSNP_HIT	:
-			pe.config=0x5102d2
+			pe.config=0x5102d2;
 			break;
 		case	PAPI_MEM_LOAD_L3_HIT_RETIRED_XSNP_HITM	:
-			pe.config=0x5104d2
+			pe.config=0x5104d2;
 			break;
 		case	PAPI_MEM_LOAD_L3_HIT_RETIRED_XSNP_MISS	:
-			pe.config=0x5101d2
+			pe.config=0x5101d2;
 			break;
 		case	PAPI_MEM_LOAD_L3_HIT_RETIRED_XSNP_NONE	:
-			pe.config=0x5108d2
+			pe.config=0x5108d2;
 			break;
 		case	PAPI_MEM_LOAD_MISC_RETIRED_UC	:
-			pe.config=0x5104d4
+			pe.config=0x5104d4;
 			break;
 		case	PAPI_MEM_LOAD_RETIRED_FB_HIT	:
-			pe.config=0x5140d1
+			pe.config=0x5140d1;
 			break;
 		case	PAPI_MEM_LOAD_RETIRED_L1_HIT	:
-			pe.config=0x5101d1
+			pe.config=0x5101d1;
 			break;
 		case	PAPI_MEM_LOAD_RETIRED_L1_MISS	:
-			pe.config=0x5108d1
+			pe.config=0x5108d1;
 			break;
 		case	PAPI_MEM_LOAD_RETIRED_L2_HIT	:
-			pe.config=0x5102d1
+			pe.config=0x5102d1;
 			break;
 		case	PAPI_MEM_LOAD_RETIRED_L2_MISS	:
-			pe.config=0x5110d1
+			pe.config=0x5110d1;
 			break;
 		case	PAPI_MEM_LOAD_RETIRED_L3_HIT	:
-			pe.config=0x5104d1
+			pe.config=0x5104d1;
 			break;
 		case	PAPI_MEM_LOAD_RETIRED_L3_MISS	:
-			pe.config=0x5120d1
+			pe.config=0x5120d1;
 			break;
 		case	PAPI_RTM_RETIRED_ABORTED	:
-			pe.config=0x5104c9
+			pe.config=0x5104c9;
 			break;
 
         default:
             printf("EventCode not found in PEBS/IBS event! Enter a valid code!");
-            return -1;
+            //return -1;
             break;
-  }
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
-int main(int argc, char** argv) {
-
+    return pe;
 }
