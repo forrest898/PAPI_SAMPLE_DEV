@@ -81,3 +81,4 @@ matrix_multiply.o: matrix_multiply.c matrix_multiply.h
 clean:
 	-rm -f *.o
 	-rm -f $(PROGRAM_LIST)
+	-rm -f wowie*

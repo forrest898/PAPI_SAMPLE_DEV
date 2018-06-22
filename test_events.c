@@ -62,10 +62,10 @@ int main(int argc, char** argv) {
     	filename[len + 2] = '\0';
 	}
 
-	printf("%s\n", filename );
+	// /printf("%s\n", filename );
 
 	conv = atoi(argv[1]);
-
+	printf("%d\n", conv);
 //	printf("%s", argv[1]);
 
 	ev = (int *)malloc(sizeof(int)*1);
@@ -76,14 +76,14 @@ int main(int argc, char** argv) {
 	//printf("%s", argv[1]);
 
 	//hack to clear file contents
-	fp = freopen(filename2, "w+", stdout);
+	fp = freopen(filename, "w+", stdout);
 	fclose(fp);
 
 
 		//printf("Yo yo yo \n");
 
 
-	ret = PAPI_sample_init(1, ev, 1, sample_type, 100000, filename2);
+	ret = PAPI_sample_init(1, ev, 1, sample_type, 100000, filename);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
@@ -92,6 +92,9 @@ int main(int argc, char** argv) {
 	//PAPI_sample_start(1);
 
 	naive_matrix_multiply(0);
+	naive_matrix_multiply(0);
+	instructions_million();
+	instructions_million();
 
 	printf("Yo yo yo \n");
 
