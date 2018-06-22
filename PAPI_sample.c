@@ -36,6 +36,7 @@ static int* fds;
 
 long long prev_head = 0;
 
+char *output_file;
 void *our_mmap;
 //#define SAMPLE_FREQUENCY 100000
 
@@ -64,7 +65,8 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 		NULL, /*validate */
 		quiet,
 		NULL, /* events read */
-		RAW_NONE);
+		RAW_NONE,
+		output_file);
 //    printf("I got interrupted\n");
 	//count_total++;
 
@@ -76,7 +78,7 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 
 /* Base API for simple write-out results */
 int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
-                        int sample_type, int sample_period, char filename) {
+                        int sample_type, int sample_period, char* filename) {
 
     int ret, i, firstEvent;
     //int* fds;
@@ -88,6 +90,9 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
     struct perf_event_attr pe;
     struct sigaction sa;
     char test_string[]="Testing Intel PEBS support...";
+
+	//set the filename that parse_record will write results to
+	output_file = filename;
 
      //quiet=test_quiet();
     fds = (int *)malloc(sizeof(int)*NumEvents);
@@ -216,10 +221,13 @@ int PAPI_sample_start(int Eventset) {
      		}
     	}
 
-		instructions_million();
-		instructions_million();
+	//	instructions_million();
+		//instructions_million();
 
     }
+
+
+
     return PAPI_OK;
 
 }

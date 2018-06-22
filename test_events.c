@@ -36,11 +36,24 @@ int main(int argc, char** argv) {
 
 	int ret;
 	int *ev;
+	char *filename = "wowie";
+
 	ev = (int *)malloc(sizeof(int)*1);
 
 	*ev = PAPI_INST_RETIRED_TOTAL_INST;
+	FILE *fp;
 
-	ret = PAPI_sample_init(1, ev, 1, sample_type, 100000, 'A');
+	printf("%s", filename);
+
+	//hack to clear file contents
+	fp = freopen(filename, "w+", stdout);
+	fclose(fp);
+
+
+		//printf("Yo yo yo \n");
+
+
+	ret = PAPI_sample_init(1, ev, 1, sample_type, 100000, filename);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
@@ -49,6 +62,8 @@ int main(int argc, char** argv) {
 	//PAPI_sample_start(1);
 
 	naive_matrix_multiply(0);
+
+	printf("Yo yo yo \n");
 
 	// /PAPI_sample_stop(1);
 

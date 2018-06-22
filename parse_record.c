@@ -322,18 +322,22 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			int sample_type, int read_format, long long reg_mask,
 			struct validate_values *validate,
 			int quiet, int *events_read,
-			int raw_type ) {
+			int raw_type, char* file) {
 
 	struct perf_event_mmap_page *control_page = our_mmap;
 	long long head,offset;
 	int i,size;
 	long long bytesize,prev_head_wrap;
+	FILE *fp;
+
+
+	fp = freopen(file, "a+", stdout);
 
 	unsigned char *data;
 
 	void *data_mmap=our_mmap+getpagesize();
 
-	
+
 	if (mmap_size==0) return 0;
 
 	if (control_page==NULL) {
@@ -1148,6 +1152,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 	control_page->data_tail=head;
 
 	free(data);
+	fclose(fp);
 
 	return head;
 

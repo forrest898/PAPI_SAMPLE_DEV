@@ -73,7 +73,7 @@ test_utils.o: test_utils.c test_utils.h
 parse_record.o: parse_record.c parse_record.h
 	$(CC) $(CFLAGS) -c parse_record.c
 
-matrix_multiply.o: matrix_multiply.c matrix_multiply.o
+matrix_multiply.o: matrix_multiply.c matrix_multiply.h
 	$(CC) $(CFLAGS) -c matrix_multiply.c
 
 

@@ -54,7 +54,7 @@
 
 
 int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
-    int sample_type, int sample_period, char filename);
+    int sample_type, int sample_period, char* filename);
 
 struct perf_event_attr setup_perf(int EventCode, int sample_type,
     int sample_period, int firstEvent);
