@@ -188,14 +188,10 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
 
 	ret=ioctl(fds[0], PERF_EVENT_IOC_ENABLE,0);
 
-	//	instructions_million();
-		//instructions_million();
+
 
 
     return PAPI_OK;
-
-	//	instructions_million();
-		//instructions_million();
 
 
 }
@@ -288,7 +284,7 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
     pe.exclude_kernel=1;
     pe.exclude_hv=1;
     pe.wakeup_events=1;
-    pe.precise_ip=1;
+    //pe.precise_ip=1;
 
   /* Prototype for Skylake machines */
 
