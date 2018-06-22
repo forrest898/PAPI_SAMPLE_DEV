@@ -31,9 +31,11 @@ gen_list:	gen_list.o
 			$(LIBS)
 
 test_events:	test_events.o PAPI_sample.o instructions_testcode.o \
-				perf_helpers.o test_utils.o
+				perf_helpers.o test_utils.o parse_record.o \
+				matrix_multiply.o
 				$(CC) -o test_events test_events.o PAPI_sample.o \
-				instructions_testcode.o perf_helpers.o test_utils.o
+				instructions_testcode.o perf_helpers.o test_utils.o \
+				parse_record.o matrix_multiply.o
 
 #$(PROGRAM_LIST): %: %.c
 #	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
@@ -67,6 +69,14 @@ perf_helpers.o: perf_helpers.c perf_helpers.h
 
 test_utils.o: test_utils.c test_utils.h
 	$(CC) $(CFLAGS) -c test_utils.c
+
+parse_record.o: parse_record.c parse_record.h
+	$(CC) $(CFLAGS) -c parse_record.c
+
+matrix_multiply.o: matrix_multiply.c matrix_multiply.o
+	$(CC) $(CFLAGS) -c matrix_multiply.c
+
+
 
 clean:
 	-rm -f *.o

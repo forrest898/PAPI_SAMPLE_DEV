@@ -28,12 +28,13 @@
 
 
 #define MMAP_DATA_SIZE 8
-#define DEBUG 0
+#define DEBUG 1
 
 //static int32_t init = 0;
 static int32_t quiet=0;
-static int* fds = NULL;
+static int* fds;
 
+long long prev_head = 0;
 
 void *our_mmap;
 //#define SAMPLE_FREQUENCY 100000
@@ -50,15 +51,21 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 
 	ret=ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
 
-    /*
+	int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
+			PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
+			PERF_SAMPLE_ID | PERF_SAMPLE_CPU | PERF_SAMPLE_PERIOD |
+			PERF_SAMPLE_STREAM_ID | PERF_SAMPLE_RAW |
+			PERF_SAMPLE_DATA_SRC;
+
+
 	prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
 		sample_type,read_format,
 		0, /* reg_mask */
-//		NULL, /*validate */
-///		quiet,
-//		NULL, /* events read */
-//		RAW_NONE);
-    printf("I got interrupted\n");
+		NULL, /*validate */
+		quiet,
+		NULL, /* events read */
+		RAW_NONE);
+//    printf("I got interrupted\n");
 	//count_total++;
 
 	ret=ioctl(fd, PERF_EVENT_IOC_REFRESH, 1);
@@ -73,6 +80,7 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
 
     int ret, i, firstEvent;
     //int* fds;
+	int fd1;
     int mmap_pages=1+MMAP_DATA_SIZE;
     int quiet = 0;
     int read_format;
@@ -96,18 +104,58 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
         exit(1);
     }
 
+//	pe = setup_perf(EventCodes[0], sample_type, sample_period, firstEvent);
+	/*
+	fd1=perf_event_open(&pe,0,-1,-1,0);
+	if (fd1<0) {
+		if (!quiet) {
+			fprintf(stderr,"Problem opening leader %s\n",
+			strerror(errno));
+			fprintf(stderr,"Trying without branches\n");
+		}
+		sample_type&=~PERF_SAMPLE_BRANCH_STACK;
+		pe.sample_type=sample_type;
+		fd1=perf_event_open(&pe,0,-1,-1,0);
+		if (fd1<0) {
+			if (!quiet) {
+				fprintf(stderr,"Error opening leader %s\n",
+					strerror(errno));
+			}
+			test_fail(test_string);
+		}
+	}
+*/
+
+
     for(i = 0; i < NumEvents; i++) {
 
         memset(&pe,0,sizeof(struct perf_event_attr));
         pe = setup_perf(EventCodes[i], sample_type, sample_period, firstEvent);
 
         if(firstEvent) {
-            fds[i] = perf_event_open(&pe,0,-1,-1,0);
-            if (fds[i]<0) {
-    			if (!quiet) {
-    				fprintf(stderr,"Error opening leader %s\n",
-    					strerror(errno));
-    			}
+
+			if(DEBUG) {
+				printf("Value of i is %d\n \
+						Eventcode is 0x%x\n", i, pe.config);
+			}
+
+            fds[0] = perf_event_open(&pe,0,-1,-1,0);
+            if (fds[0] < 0) {
+	    		if (!quiet) {
+					fprintf(stderr,"Problem opening leader %s\n",
+					strerror(errno));
+					fprintf(stderr,"Trying without branches\n");
+				}
+				sample_type&=~PERF_SAMPLE_BRANCH_STACK;
+				pe.sample_type=sample_type;
+				fds[0]=perf_event_open(&pe,0,-1,-1,0);
+				if (fds[0]<0) {
+					if (!quiet) {
+						fprintf(stderr,"Error opening leader %s\n",
+							strerror(errno));
+					}
+					test_fail(test_string);
+				}
     			//test_fail(test_string);
     		}
         }
@@ -135,7 +183,20 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
 	fcntl(fds[0], F_SETSIG, SIGIO);
 	fcntl(fds[0], F_SETOWN,getpid());
 
+
+	ioctl(fds[0], PERF_EVENT_IOC_RESET, 0);
+
+	ret=ioctl(fds[0], PERF_EVENT_IOC_ENABLE,0);
+
+	//	instructions_million();
+		//instructions_million();
+
+
     return PAPI_OK;
+
+	//	instructions_million();
+		//instructions_million();
+
 
 }
 
@@ -159,16 +220,43 @@ int PAPI_sample_start(int Eventset) {
      		}
     	}
 
+		instructions_million();
+		instructions_million();
+
     }
+    return PAPI_OK;
 
 }
 
 int PAPI_sample_stop(int Eventset) {
 
     int ret;
+	int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
+			PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
+			PERF_SAMPLE_ID | PERF_SAMPLE_CPU | PERF_SAMPLE_PERIOD |
+			PERF_SAMPLE_STREAM_ID | PERF_SAMPLE_RAW |
+			PERF_SAMPLE_DATA_SRC;
 
     ret=ioctl(fds[0], PERF_EVENT_IOC_REFRESH,0);
     printf("File ready for parsing\n");
+
+ int read_format = PERF_FORMAT_GROUP |
+	 PERF_FORMAT_ID |
+	 PERF_FORMAT_TOTAL_TIME_ENABLED |
+	 PERF_FORMAT_TOTAL_TIME_RUNNING;
+
+ ret=ioctl(fds[0], PERF_EVENT_IOC_DISABLE, 0);
+
+
+// prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
+	// sample_type,read_format,
+	 //0, /* reg_mask */
+//		NULL, /*validate */
+//		quiet,
+//		NULL, /* events read */
+//		RAW_NONE);
+
+    return PAPI_OK;
 
 }
 
@@ -281,6 +369,9 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
 			break;
 		case	PAPI_INST_RETIRED_TOTAL_CYCLES	:
 			pe.config=0xad101c0;
+			break;
+		case	PAPI_INST_RETIRED_TOTAL_INST	:
+			pe.config=0x5100c0;
 			break;
 		case	PAPI_MEM_LOAD_L3_HIT_RETIRED_XSNP_HIT	:
 			pe.config=0x5102d2;

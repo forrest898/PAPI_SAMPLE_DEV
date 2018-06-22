@@ -6,3 +6,4 @@ print_record_sample.c
 gen_defines
 *.o
 gen_list
+test_events

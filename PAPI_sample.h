@@ -50,6 +50,7 @@
 #define PAPI_MEM_LOAD_RETIRED_L3_HIT	47
 #define PAPI_MEM_LOAD_RETIRED_L3_MISS	48
 #define PAPI_RTM_RETIRED_ABORTED	49
+#define PAPI_INST_RETIRED_TOTAL_INST    50
 
 
 int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,

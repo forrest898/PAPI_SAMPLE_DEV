@@ -23,19 +23,22 @@
 #include "perf_event.h"
 #include "perf_helpers.h"
 #include <papi.h>
+#include "matrix_multiply.h"
 
 int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
 		PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
 		PERF_SAMPLE_ID | PERF_SAMPLE_CPU | PERF_SAMPLE_PERIOD |
 		PERF_SAMPLE_STREAM_ID | PERF_SAMPLE_RAW |
-		PERF_SAMPLE_BRANCH_STACK | PERF_SAMPLE_DATA_SRC;
+		PERF_SAMPLE_DATA_SRC;
 
 
 int main(int argc, char** argv) {
 
 	int ret;
 	int *ev;
-	*ev = PAPI_INST_RETIRED_TOTAL_CYCLES;
+	ev = (int *)malloc(sizeof(int)*1);
+
+	*ev = PAPI_INST_RETIRED_TOTAL_INST;
 
 	ret = PAPI_sample_init(1, ev, 1, sample_type, 100000, 'A');
 	if(ret != PAPI_OK) {
@@ -43,9 +46,11 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	PAPI_sample_start(1);
+	//PAPI_sample_start(1);
 
-	PAPI_sample_stop(1);
+	naive_matrix_multiply(0);
+
+	// /PAPI_sample_stop(1);
 
 	return 0;
 
