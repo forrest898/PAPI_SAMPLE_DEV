@@ -1,0 +1,4 @@
+This repository represents the first attempt to develop sampling with PAPI.
+
+As of 2:56pm, 
+about half of the events for the Skylake processor series are working with an i7-6820HQ on a lenovo t460p with ubuntu 
