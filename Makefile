@@ -1,7 +1,7 @@
 TARGET = prog
-LIBS = -lm -lpfm
+LIBS = -lm ~/papi/src/libpapi.a ~/perfmon2-libpfm4/lib/libpfm.a
 CC = gcc
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -I ~/perfmon2-libpfm4/include -I ~/papi/src
 
 .PHONY: clean all default
 
@@ -35,7 +35,7 @@ test_events:	test_events.o PAPI_sample.o instructions_testcode.o \
 				matrix_multiply.o
 				$(CC) -o test_events test_events.o PAPI_sample.o \
 				instructions_testcode.o perf_helpers.o test_utils.o \
-				parse_record.o matrix_multiply.o
+				parse_record.o matrix_multiply.o $(LIBS)
 
 #$(PROGRAM_LIST): %: %.c
 #	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
@@ -44,7 +44,7 @@ char_replace.o: char_replace.c char_replace.h
 	$(CC) $(CFLAGS) -c char_replace.c
 
 gen_codes.o: gen_codes.c
-	$(CC) $(CFLAGS) -c gen_codes.c
+	$(CC) $(CFLAGS) -c gen_codes.c $(LIBS)
 
 nameevents.o: nameevents.c
 	$(CC) $(CFLAGS) -c nameevents.c
@@ -59,7 +59,7 @@ gen_list.o: gen_list.c
 	$(CC) $(CFLAGS) -c gen_list.c
 
 test_events.o: test_events.c
-	$(CC) $(CFLAGS) -c test_events.c
+	$(CC) $(CFLAGS) -c test_events.c 
 
 instructions_testcode.o: instructions_testcode.c instructions_testcode.h
 	$(CC) $(CFLAGS) -c instructions_testcode.c
