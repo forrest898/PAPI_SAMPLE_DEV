@@ -1,10 +1,10 @@
 include Makefile.globals.inc
 
 all:
-		$(MAKE) -c src
+		$(MAKE) -C src
 
 clean: clean-local
-		$(MAKE) -c src clean
+		$(MAKE) -C src clean
 
 clean-local:
 		@- $(RM) *~
