@@ -14,4 +14,6 @@ User specifies a buffer which results are copied to.
 
 Implementation similar to overflow handler?
 	write to buffer instead of to screen?
-	
+
+6/25
+How do we tie the sampling interface to an eventset considering that it is largely perf related and not PAPI code?	
