@@ -189,12 +189,9 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
 	fcntl(fds[0], F_SETOWN,getpid());
 
 
-	ioctl(fds[0], PERF_EVENT_IOC_RESET, 0);
+	//ioctl(fds[0], PERF_EVENT_IOC_RESET, 0);
 
-	ret=ioctl(fds[0], PERF_EVENT_IOC_ENABLE,0);
-
-
-
+	//ret=ioctl(fds[0], PERF_EVENT_IOC_ENABLE,0);
 
     return PAPI_OK;
 
@@ -221,12 +218,7 @@ int PAPI_sample_start(int Eventset) {
      		}
     	}
 
-	//	instructions_million();
-		//instructions_million();
-
     }
-
-
 
     return PAPI_OK;
 
@@ -244,13 +236,12 @@ int PAPI_sample_stop(int Eventset) {
     ret=ioctl(fds[0], PERF_EVENT_IOC_REFRESH,0);
     printf("File ready for parsing\n");
 
- int read_format = PERF_FORMAT_GROUP |
-	 PERF_FORMAT_ID |
-	 PERF_FORMAT_TOTAL_TIME_ENABLED |
-	 PERF_FORMAT_TOTAL_TIME_RUNNING;
+ 	int read_format = PERF_FORMAT_GROUP |
+	 	PERF_FORMAT_ID |
+	 	PERF_FORMAT_TOTAL_TIME_ENABLED |
+	 	PERF_FORMAT_TOTAL_TIME_RUNNING;
 
- ret=ioctl(fds[0], PERF_EVENT_IOC_DISABLE, 0);
-
+ 	ret=ioctl(fds[0], PERF_EVENT_IOC_DISABLE, 0);
 
 // prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
 	// sample_type,read_format,
@@ -259,6 +250,10 @@ int PAPI_sample_stop(int Eventset) {
 //		quiet,
 //		NULL, /* events read */
 //		RAW_NONE);
+
+	munmap(our_mmap, 1+MMAP_DATA_SIZE*getpagesize());
+		//munmap(our_mmap,mmap_pages*4096);
+
 
     return PAPI_OK;
 

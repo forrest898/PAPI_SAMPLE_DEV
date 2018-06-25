@@ -34,9 +34,10 @@ int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
 
 int main(int argc, char** argv) {
 
-	int ret, conv;
+	int ret, conv, i;
 	int *ev;
 	char *filename2 = "wowie";
+	FILE *fp;
 
 	if(argc != 2) {
 		printf("Please pass the req'd args\n");
@@ -64,14 +65,16 @@ int main(int argc, char** argv) {
 
 	// /printf("%s\n", filename );
 
+	//convert argument to integer because the sampling events are defined
+	// as 1-50 for right now
 	conv = atoi(argv[1]);
 	printf("%d\n", conv);
-//	printf("%s", argv[1]);
 
 	ev = (int *)malloc(sizeof(int)*1);
 
+	//set the sampling event
 	*ev = conv;
-	FILE *fp;
+
 
 	//printf("%s", argv[1]);
 
@@ -80,25 +83,22 @@ int main(int argc, char** argv) {
 	fclose(fp);
 
 
-		//printf("Yo yo yo \n");
-
-
+	// initialize sampling
 	ret = PAPI_sample_init(1, ev, 1, sample_type, 100000, filename);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
 	}
 
-	//PAPI_sample_start(1);
+	PAPI_sample_start(1);
 
-	naive_matrix_multiply(0);
-	naive_matrix_multiply(0);
-	instructions_million();
-	instructions_million();
+	for(i = 0; i < 1; i++) {
+		naive_matrix_multiply(0);
+	}
 
 	printf("Yo yo yo \n");
 
-	// /PAPI_sample_stop(1);
+	PAPI_sample_stop(1);
 
 	return 0;
 
