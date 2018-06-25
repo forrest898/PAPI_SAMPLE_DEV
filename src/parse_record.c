@@ -37,7 +37,7 @@
 static int handle_struct_read_format(unsigned char *sample,
 				     int read_format,
 				     struct validate_values *validation,
-				     int quiet) {
+				     int quiet, FILE* fp) {
 
 	int offset=0,i;
 
@@ -45,7 +45,7 @@ static int handle_struct_read_format(unsigned char *sample,
 		long long nr,time_enabled,time_running;
 
 		memcpy(&nr,&sample[offset],sizeof(long long));
-		if (!quiet) printf("\t\tNumber: %lld ",nr);
+		if (!quiet) fprintf(fp, "\t\tNumber: %lld ",nr);
 		offset+=8;
 
 		if (validation) {
@@ -58,31 +58,31 @@ static int handle_struct_read_format(unsigned char *sample,
 
 		if (read_format & PERF_FORMAT_TOTAL_TIME_ENABLED) {
 			memcpy(&time_enabled,&sample[offset],sizeof(long long));
-			if (!quiet) printf("enabled: %lld ",time_enabled);
+			if (!quiet) fprintf(fp, "enabled: %lld ",time_enabled);
 			offset+=8;
 		}
 		if (read_format & PERF_FORMAT_TOTAL_TIME_RUNNING) {
 			memcpy(&time_running,&sample[offset],sizeof(long long));
-			if (!quiet) printf("running: %lld ",time_running);
+			if (!quiet) fprintf(fp, "running: %lld ",time_running);
 			offset+=8;
 		}
 
-		if (!quiet) printf("\n");
+		if (!quiet) fprintf(fp, "\n");
 
 		for(i=0;i<nr;i++) {
 			long long value, id;
 
 			memcpy(&value,&sample[offset],sizeof(long long));
-			if (!quiet) printf("\t\t\tValue: %lld ",value);
+			if (!quiet) fprintf(fp, "\t\t\tValue: %lld ",value);
 			offset+=8;
 
 			if (read_format & PERF_FORMAT_ID) {
 				memcpy(&id,&sample[offset],sizeof(long long));
-				if (!quiet) printf("id: %lld ",id);
+				if (!quiet) fprintf(fp, "id: %lld ",id);
 				offset+=8;
 			}
 
-			if (!quiet) printf("\n");
+			if (!quiet) fprintf(fp, "\n");
 		}
 	}
 	else {
@@ -90,29 +90,30 @@ static int handle_struct_read_format(unsigned char *sample,
 		long long value,time_enabled,time_running,id;
 
 		memcpy(&value,&sample[offset],sizeof(long long));
-		if (!quiet) printf("\t\tValue: %lld ",value);
+		if (!quiet) fprintf(fp, "\t\tValue: %lld ",value);
 		offset+=8;
 
 		if (read_format & PERF_FORMAT_TOTAL_TIME_ENABLED) {
 			memcpy(&time_enabled,&sample[offset],sizeof(long long));
-			if (!quiet) printf("enabled: %lld ",time_enabled);
+			if (!quiet) fprintf(fp, "enabled: %lld ",time_enabled);
 			offset+=8;
 		}
 		if (read_format & PERF_FORMAT_TOTAL_TIME_RUNNING) {
 			memcpy(&time_running,&sample[offset],sizeof(long long));
-			if (!quiet) printf("running: %lld ",time_running);
+			if (!quiet) fprintf(fp, "running: %lld ",time_running);
 			offset+=8;
 		}
 		if (read_format & PERF_FORMAT_ID) {
 			memcpy(&id,&sample[offset],sizeof(long long));
-			if (!quiet) printf("id: %lld ",id);
+			if (!quiet) fprintf(fp, "id: %lld ",id);
 			offset+=8;
 		}
-		if (!quiet) printf("\n");
+		if (!quiet) fprintf(fp, "\n");
 	}
 
 	return offset;
 }
+
 
 #if defined(__x86_64__)
 
@@ -765,7 +766,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_READ, read_format\n");
 				length=handle_struct_read_format(&data[offset],
 						read_format,
-						validate,quiet);
+						validate,quiet,fp);
 				if (length>=0) offset+=length;
 			}
 			if (sample_type & PERF_SAMPLE_CALLCHAIN) {

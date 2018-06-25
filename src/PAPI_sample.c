@@ -28,7 +28,7 @@
 
 
 #define MMAP_DATA_SIZE 8
-#define DEBUG 1
+#define DEBUG 0
 
 //static int32_t init = 0;
 static int32_t quiet=0;
@@ -123,7 +123,7 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
 				printf("Value of i is %d\n \
 						Eventcode is 0x%x\n", i, pe.config);
 			}
-
+			pe.config=0x511ff1;
             fds[0] = perf_event_open(&pe,0,-1,-1,0);
             if (fds[0] < 0) {
 	    		if (!quiet) {

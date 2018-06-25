@@ -66,10 +66,11 @@ int main(int argc, char** argv) {
 	conv = atoi(argv[1]);
 	printf("%d\n", conv);
 
-	ev = (int *)malloc(sizeof(int)*1);
+	ev = (int *)malloc(sizeof(int)*2);
 
 	//set the sampling event
-	*ev = conv;
+	ev[0] = conv;
+	ev[1] = 36;
 
 	// initialize sampling
 	ret = PAPI_sample_init(1, ev, 2, sample_type, 100000, filename);
@@ -84,11 +85,11 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	for(i = 0; i < 100; i++) {
+	for(i = 0; i < 1; i++) {
 		naive_matrix_multiply(0);
 	}
 
-	printf("Yo yo yo \n");
+	//printf("Yo yo yo \n");
 
 	PAPI_sample_stop(1);
 
