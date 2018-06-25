@@ -47,8 +47,6 @@ int main(int argc, char** argv) {
 	size_t len = strlen(filename2);
 	size_t len2 = strlen(argv[1]);
 
-	//printf("%d\n", len2)
-
 	char* filename = malloc(len + len2 + 1 ); /* one for extra char, one for trailing zero */
     strcpy(filename, filename2);
 	if(len2 == 1) {
@@ -63,8 +61,6 @@ int main(int argc, char** argv) {
     	filename[len + 2] = '\0';
 	}
 
-	// /printf("%s\n", filename );
-
 	//convert argument to integer because the sampling events are defined
 	// as 1-50 for right now
 	conv = atoi(argv[1]);
@@ -74,15 +70,6 @@ int main(int argc, char** argv) {
 
 	//set the sampling event
 	*ev = conv;
-	//ev[1] = 36;
-
-
-	//printf("%s", argv[1]);
-
-	//hack to clear file contents
-	fp = freopen(filename, "w+", stdout);
-	fclose(fp);
-
 
 	// initialize sampling
 	ret = PAPI_sample_init(1, ev, 2, sample_type, 100000, filename);

@@ -91,6 +91,9 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
     struct sigaction sa;
     char test_string[]="Testing Intel PEBS support...";
 
+	FILE* fp = fopen(filename, "w");
+	fclose(fp);
+
 	//set the filename that parse_record will write results to
 	output_file = filename;
 

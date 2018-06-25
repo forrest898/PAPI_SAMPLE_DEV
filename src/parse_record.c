@@ -316,7 +316,6 @@ static int dump_raw_ibs_op(unsigned char *data, int size) {
 }
 
 static int debug=0;
-
 long long perf_mmap_read( void *our_mmap, int mmap_size,
 			long long prev_head,
 			int sample_type, int read_format, long long reg_mask,
@@ -331,7 +330,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 	FILE *fp;
 
 
-	fp = freopen(file, "a+", stdout);
+	fp = fopen(file, "a");
 
 	unsigned char *data;
 
@@ -351,14 +350,14 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 	size=head-prev_head;
 
 	if (debug) {
-		printf("Head: %lld Prev_head=%lld\n",head,prev_head);
-		printf("%d new bytes\n",size);
+		fprintf(fp, "Head: %lld Prev_head=%lld\n",head,prev_head);
+		fprintf(fp, "%d new bytes\n",size);
 	}
 
 	bytesize=mmap_size*getpagesize();
 
 	if (size>bytesize) {
-		printf("error!  we overflowed the mmap buffer %d>%lld bytes\n",
+		fprintf(fp, "error!  we overflowed the mmap buffer %d>%lld bytes\n",
 			size,bytesize);
 	}
 
@@ -368,13 +367,13 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 	}
 
 	if (debug) {
-		printf("Allocated %lld bytes at %p\n",bytesize,data);
+		fprintf(fp, "Allocated %lld bytes at %p\n",bytesize,data);
 	}
 
 	prev_head_wrap=prev_head%bytesize;
 
 	if (debug) {
-		printf("Copying %lld bytes from (%p)+%lld to (%p)+%d\n",
+		fprintf(fp, "Copying %lld bytes from (%p)+%lld to (%p)+%d\n",
 			  bytesize-prev_head_wrap,data_mmap,prev_head_wrap,data,0);
 	}
 
@@ -382,7 +381,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 		bytesize-prev_head_wrap);
 
 	if (debug) {
-		printf("Copying %lld bytes from %d to %lld\n",
+		fprintf(fp, "Copying %lld bytes from %d to %lld\n",
 			prev_head_wrap,0,bytesize-prev_head_wrap);
 	}
 
@@ -397,7 +396,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 
 	while(offset<size) {
 
-		if (debug) printf("Offset %lld Size %d\n",offset,size);
+		if (debug) fprintf(fp, "Offset %lld Size %d\n",offset,size);
 		event = ( struct perf_event_header * ) & data[offset];
 
 		/********************/
@@ -407,99 +406,99 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 		if (!quiet) {
 			switch(event->type) {
 				case PERF_RECORD_MMAP:
-					printf("PERF_RECORD_MMAP");
+					fprintf(fp, "PERF_RECORD_MMAP");
 					break;
 				case PERF_RECORD_LOST:
-					printf("PERF_RECORD_LOST");
+					fprintf(fp, "PERF_RECORD_LOST");
 					break;
 				case PERF_RECORD_COMM:
-					printf("PERF_RECORD_COMM");
+					fprintf(fp, "PERF_RECORD_COMM");
 					break;
 				case PERF_RECORD_EXIT:
-					printf("PERF_RECORD_EXIT");
+					fprintf(fp, "PERF_RECORD_EXIT");
 					break;
 				case PERF_RECORD_THROTTLE:
-					printf("PERF_RECORD_THROTTLE");
+					fprintf(fp, "PERF_RECORD_THROTTLE");
 					break;
 				case PERF_RECORD_UNTHROTTLE:
-					printf("PERF_RECORD_UNTHROTTLE");
+					fprintf(fp, "PERF_RECORD_UNTHROTTLE");
 					break;
 				case PERF_RECORD_FORK:
-					printf("PERF_RECORD_FORK");
+					fprintf(fp, "PERF_RECORD_FORK");
 					break;
 				case PERF_RECORD_READ:
-					printf("PERF_RECORD_READ");
+					fprintf(fp, "PERF_RECORD_READ");
 					break;
 				case PERF_RECORD_SAMPLE:
-					printf("PERF_RECORD_SAMPLE [%x]",sample_type);
+					fprintf(fp, "PERF_RECORD_SAMPLE [%x]",sample_type);
 					break;
 				case PERF_RECORD_MMAP2:
-					printf("PERF_RECORD_MMAP2");
+					fprintf(fp, "PERF_RECORD_MMAP2");
 					break;
 				case PERF_RECORD_AUX:
-					printf("PERF_RECORD_AUX");
+					fprintf(fp, "PERF_RECORD_AUX");
 					break;
 				case PERF_RECORD_ITRACE_START:
-					printf("PERF_RECORD_ITRACE_START");
+					fprintf(fp, "PERF_RECORD_ITRACE_START");
 					break;
 				case PERF_RECORD_LOST_SAMPLES:
-					printf("PERF_RECORD_LOST_SAMPLES");
+					fprintf(fp, "PERF_RECORD_LOST_SAMPLES");
 					break;
 				case PERF_RECORD_SWITCH:
-					printf("PERF_RECORD_SWITCH");
+					fprintf(fp, "PERF_RECORD_SWITCH");
 					break;
 				case PERF_RECORD_SWITCH_CPU_WIDE:
-					printf("PERF_RECORD_SWITCH_CPU_WIDE");
+					fprintf(fp, "PERF_RECORD_SWITCH_CPU_WIDE");
 					break;
-				default: printf("UNKNOWN %d",event->type);
+				default: fprintf(fp, "UNKNOWN %d",event->type);
 					break;
 			}
 
-			printf(", MISC=%d (",event->misc);
+			fprintf(fp, ", MISC=%d (",event->misc);
 			switch(event->misc & PERF_RECORD_MISC_CPUMODE_MASK) {
 				case PERF_RECORD_MISC_CPUMODE_UNKNOWN:
-					printf("PERF_RECORD_MISC_CPUMODE_UNKNOWN"); break;
+					fprintf(fp, "PERF_RECORD_MISC_CPUMODE_UNKNOWN"); break;
 				case PERF_RECORD_MISC_KERNEL:
-					printf("PERF_RECORD_MISC_KERNEL"); break;
+					fprintf(fp, "PERF_RECORD_MISC_KERNEL"); break;
 				case PERF_RECORD_MISC_USER:
-					printf("PERF_RECORD_MISC_USER"); break;
+					fprintf(fp, "PERF_RECORD_MISC_USER"); break;
 				case PERF_RECORD_MISC_HYPERVISOR:
-					printf("PERF_RECORD_MISC_HYPERVISOR"); break;
+					fprintf(fp, "PERF_RECORD_MISC_HYPERVISOR"); break;
 				case PERF_RECORD_MISC_GUEST_KERNEL:
-					printf("PERF_RECORD_MISC_GUEST_KERNEL"); break;
+					fprintf(fp, "PERF_RECORD_MISC_GUEST_KERNEL"); break;
 				case PERF_RECORD_MISC_GUEST_USER:
-					printf("PERF_RECORD_MISC_GUEST_USER"); break;
+					fprintf(fp, "PERF_RECORD_MISC_GUEST_USER"); break;
 				default:
-					printf("Unknown %d!\n",event->misc); break;
+					fprintf(fp, "Unknown %d!\n",event->misc); break;
 			}
 
 			/* All three have the same value */
 			if (event->misc & PERF_RECORD_MISC_MMAP_DATA) {
 				if (event->type==PERF_RECORD_MMAP) {
-					printf(",PERF_RECORD_MISC_MMAP_DATA ");
+					fprintf(fp, ",PERF_RECORD_MISC_MMAP_DATA ");
 				}
 				else if (event->type==PERF_RECORD_COMM) {
-					printf(",PERF_RECORD_MISC_COMM_EXEC ");
+					fprintf(fp, ",PERF_RECORD_MISC_COMM_EXEC ");
 				}
 				else if ((event->type==PERF_RECORD_SWITCH) ||
 					(event->type==PERF_RECORD_SWITCH_CPU_WIDE)) {
-					printf(",PERF_RECORD_MISC_SWITCH_OUT ");
+					fprintf(fp, ",PERF_RECORD_MISC_SWITCH_OUT ");
 				}
 				else {
-					printf("UNKNOWN ALIAS!!! ");
+					fprintf(fp, "UNKNOWN ALIAS!!! ");
 				}
 			}
 
 
 			if (event->misc & PERF_RECORD_MISC_EXACT_IP) {
-				printf(",PERF_RECORD_MISC_EXACT_IP ");
+				fprintf(fp, ",PERF_RECORD_MISC_EXACT_IP ");
 			}
 
 			if (event->misc & PERF_RECORD_MISC_EXT_RESERVED) {
-				printf(",PERF_RECORD_MISC_EXT_RESERVED ");
+				fprintf(fp, ",PERF_RECORD_MISC_EXT_RESERVED ");
 			}
 
-			printf("), Size=%d\n",event->size);
+			fprintf(fp, "), Size=%d\n",event->size);
 		}
 
 		offset+=8; /* skip header */
@@ -514,10 +513,10 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 		case PERF_RECORD_LOST: {
 			long long id,lost;
 			memcpy(&id,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tID: %lld\n",id);
+			if (!quiet) fprintf(fp, "\tID: %lld\n",id);
 			offset+=8;
 			memcpy(&lost,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tLOST: %lld\n",lost);
+			if (!quiet) fprintf(fp, "\tLOST: %lld\n",lost);
 			offset+=8;
 			}
 			break;
@@ -528,10 +527,10 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			char *string;
 
 			memcpy(&pid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tPID: %d\n",pid);
+			if (!quiet) fprintf(fp, "\tPID: %d\n",pid);
 			offset+=4;
 			memcpy(&tid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tTID: %d\n",tid);
+			if (!quiet) fprintf(fp, "\tTID: %d\n",tid);
 			offset+=4;
 
 			/* FIXME: sample_id handling? */
@@ -540,7 +539,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			string_size=event->size-16;
 			string=calloc(string_size,sizeof(char));
 			memcpy(string,&data[offset],string_size);
-			if (!quiet) printf("\tcomm: %s\n",string);
+			if (!quiet) fprintf(fp, "\tcomm: %s\n",string);
 			offset+=string_size;
 			if (string) free(string);
 			}
@@ -552,19 +551,19 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			long long fork_time;
 
 			memcpy(&pid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tPID: %d\n",pid);
+			if (!quiet) fprintf(fp, "\tPID: %d\n",pid);
 			offset+=4;
 			memcpy(&ppid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tPPID: %d\n",ppid);
+			if (!quiet) fprintf(fp, "\tPPID: %d\n",ppid);
 			offset+=4;
 			memcpy(&tid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tTID: %d\n",tid);
+			if (!quiet) fprintf(fp, "\tTID: %d\n",tid);
 			offset+=4;
 			memcpy(&ptid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tPTID: %d\n",ptid);
+			if (!quiet) fprintf(fp, "\tPTID: %d\n",ptid);
 			offset+=4;
 			memcpy(&fork_time,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tTime: %lld\n",fork_time);
+			if (!quiet) fprintf(fp, "\tTime: %lld\n",fork_time);
 			offset+=8;
 			}
 			break;
@@ -576,25 +575,25 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			char *filename;
 
 			memcpy(&pid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tPID: %d\n",pid);
+			if (!quiet) fprintf(fp, "\tPID: %d\n",pid);
 			offset+=4;
 			memcpy(&tid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tTID: %d\n",tid);
+			if (!quiet) fprintf(fp, "\tTID: %d\n",tid);
 			offset+=4;
 			memcpy(&address,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tAddress: %llx\n",address);
+			if (!quiet) fprintf(fp, "\tAddress: %llx\n",address);
 			offset+=8;
 			memcpy(&len,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tLength: %llx\n",len);
+			if (!quiet) fprintf(fp, "\tLength: %llx\n",len);
 			offset+=8;
 			memcpy(&pgoff,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tPage Offset: %llx\n",pgoff);
+			if (!quiet) fprintf(fp, "\tPage Offset: %llx\n",pgoff);
 			offset+=8;
 
 			string_size=event->size-40;
 			filename=calloc(string_size,sizeof(char));
 			memcpy(filename,&data[offset],string_size);
-			if (!quiet) printf("\tFilename: %s\n",filename);
+			if (!quiet) fprintf(fp, "\tFilename: %s\n",filename);
 			offset+=string_size;
 			if (filename) free(filename);
 
@@ -611,43 +610,43 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			char *filename;
 
 			memcpy(&pid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tPID: %d\n",pid);
+			if (!quiet) fprintf(fp, "\tPID: %d\n",pid);
 			offset+=4;
 			memcpy(&tid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tTID: %d\n",tid);
+			if (!quiet) fprintf(fp, "\tTID: %d\n",tid);
 			offset+=4;
 			memcpy(&address,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tAddress: %llx\n",address);
+			if (!quiet) fprintf(fp, "\tAddress: %llx\n",address);
 			offset+=8;
 			memcpy(&len,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tLength: %llx\n",len);
+			if (!quiet) fprintf(fp, "\tLength: %llx\n",len);
 			offset+=8;
 			memcpy(&pgoff,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tPage Offset: %llx\n",pgoff);
+			if (!quiet) fprintf(fp, "\tPage Offset: %llx\n",pgoff);
 			offset+=8;
 			memcpy(&major,&data[offset],sizeof(int));
-			if (!quiet) printf("\tMajor: %d\n",major);
+			if (!quiet) fprintf(fp, "\tMajor: %d\n",major);
 			offset+=4;
 			memcpy(&minor,&data[offset],sizeof(int));
-			if (!quiet) printf("\tMinor: %d\n",minor);
+			if (!quiet) fprintf(fp, "\tMinor: %d\n",minor);
 			offset+=4;
 			memcpy(&ino,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tIno: %llx\n",ino);
+			if (!quiet) fprintf(fp, "\tIno: %llx\n",ino);
 			offset+=8;
 			memcpy(&ino_generation,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tIno generation: %llx\n",ino_generation);
+			if (!quiet) fprintf(fp, "\tIno generation: %llx\n",ino_generation);
 			offset+=8;
 			memcpy(&prot,&data[offset],sizeof(int));
-			if (!quiet) printf("\tProt: %d\n",prot);
+			if (!quiet) fprintf(fp, "\tProt: %d\n",prot);
 			offset+=4;
 			memcpy(&flags,&data[offset],sizeof(int));
-			if (!quiet) printf("\tFlags: %d\n",flags);
+			if (!quiet) fprintf(fp, "\tFlags: %d\n",flags);
 			offset+=4;
 
 			string_size=event->size-72;
 			filename=calloc(string_size,sizeof(char));
 			memcpy(filename,&data[offset],string_size);
-			if (!quiet) printf("\tFilename: %s\n",filename);
+			if (!quiet) fprintf(fp, "\tFilename: %s\n",filename);
 			offset+=string_size;
 			if (filename) free(filename);
 
@@ -660,19 +659,19 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			long long fork_time;
 
 			memcpy(&pid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tPID: %d\n",pid);
+			if (!quiet) fprintf(fp, "\tPID: %d\n",pid);
 			offset+=4;
 			memcpy(&ppid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tPPID: %d\n",ppid);
+			if (!quiet) fprintf(fp, "\tPPID: %d\n",ppid);
 			offset+=4;
 			memcpy(&tid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tTID: %d\n",tid);
+			if (!quiet) fprintf(fp, "\tTID: %d\n",tid);
 			offset+=4;
 			memcpy(&ptid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tPTID: %d\n",ptid);
+			if (!quiet) fprintf(fp, "\tPTID: %d\n",ptid);
 			offset+=4;
 			memcpy(&fork_time,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tTime: %lld\n",fork_time);
+			if (!quiet) fprintf(fp, "\tTime: %lld\n",fork_time);
 			offset+=8;
 			}
 			break;
@@ -683,13 +682,13 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			long long throttle_time,id,stream_id;
 
 			memcpy(&throttle_time,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tTime: %lld\n",throttle_time);
+			if (!quiet) fprintf(fp, "\tTime: %lld\n",throttle_time);
 			offset+=8;
 			memcpy(&id,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tID: %lld\n",id);
+			if (!quiet) fprintf(fp, "\tID: %lld\n",id);
 			offset+=8;
 			memcpy(&stream_id,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tStream ID: %lld\n",stream_id);
+			if (!quiet) fprintf(fp, "\tStream ID: %lld\n",stream_id);
 			offset+=8;
 
 			}
@@ -700,7 +699,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			if (sample_type & PERF_SAMPLE_IP) {
 				long long ip;
 				memcpy(&ip,&data[offset],sizeof(long long));
-				if (!quiet) printf("\tPERF_SAMPLE_IP, IP: %llx\n",ip);
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_IP, IP: %llx\n",ip);
 				offset+=8;
 			}
 			if (sample_type & PERF_SAMPLE_TID) {
@@ -716,7 +715,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 				}
 
 				if (!quiet) {
-					printf("\tPERF_SAMPLE_TID, pid: %d  tid %d\n",pid,tid);
+					fprintf(fp, "\tPERF_SAMPLE_TID, pid: %d  tid %d\n",pid,tid);
 				}
 				offset+=8;
 			}
@@ -724,26 +723,26 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			if (sample_type & PERF_SAMPLE_TIME) {
 				long long time;
 				memcpy(&time,&data[offset],sizeof(long long));
-				if (!quiet) printf("\tPERF_SAMPLE_TIME, time: %lld\n",time);
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_TIME, time: %lld\n",time);
 				offset+=8;
 			}
 			if (sample_type & PERF_SAMPLE_ADDR) {
 				long long addr;
 				memcpy(&addr,&data[offset],sizeof(long long));
-				if (!quiet) printf("\tPERF_SAMPLE_ADDR, addr: %llx\n",addr);
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_ADDR, addr: %llx\n",addr);
 				offset+=8;
 			}
 			if (sample_type & PERF_SAMPLE_ID) {
 				long long sample_id;
 				memcpy(&sample_id,&data[offset],sizeof(long long));
-				if (!quiet) printf("\tPERF_SAMPLE_ID, sample_id: %lld\n",sample_id);
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_ID, sample_id: %lld\n",sample_id);
 				offset+=8;
 			}
 			if (sample_type & PERF_SAMPLE_STREAM_ID) {
 				long long sample_stream_id;
 				memcpy(&sample_stream_id,&data[offset],sizeof(long long));
 				if (!quiet) {
-					printf("\tPERF_SAMPLE_STREAM_ID, sample_stream_id: %lld\n",sample_stream_id);
+					fprintf(fp, "\tPERF_SAMPLE_STREAM_ID, sample_stream_id: %lld\n",sample_stream_id);
 				}
 				offset+=8;
 			}
@@ -751,19 +750,19 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 				int cpu, res;
 				memcpy(&cpu,&data[offset],sizeof(int));
 				memcpy(&res,&data[offset+4],sizeof(int));
-				if (!quiet) printf("\tPERF_SAMPLE_CPU, cpu: %d  res %d\n",cpu,res);
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_CPU, cpu: %d  res %d\n",cpu,res);
 				offset+=8;
 			}
 			if (sample_type & PERF_SAMPLE_PERIOD) {
 				long long period;
 				memcpy(&period,&data[offset],sizeof(long long));
-				if (!quiet) printf("\tPERF_SAMPLE_PERIOD, period: %lld\n",period);
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_PERIOD, period: %lld\n",period);
 				offset+=8;
 			}
 			if (sample_type & PERF_SAMPLE_READ) {
 				int length;
 
-				if (!quiet) printf("\tPERF_SAMPLE_READ, read_format\n");
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_READ, read_format\n");
 				length=handle_struct_read_format(&data[offset],
 						read_format,
 						validate,quiet);
@@ -772,12 +771,12 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			if (sample_type & PERF_SAMPLE_CALLCHAIN) {
 				long long nr,ip;
 				memcpy(&nr,&data[offset],sizeof(long long));
-				if (!quiet) printf("\tPERF_SAMPLE_CALLCHAIN, callchain length: %lld\n",nr);
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_CALLCHAIN, callchain length: %lld\n",nr);
 				offset+=8;
 
 				for(i=0;i<nr;i++) {
 					memcpy(&ip,&data[offset],sizeof(long long));
-					if (!quiet) printf("\t\t ip[%d]: %llx\n",i,ip);
+					if (!quiet) fprintf(fp, "\t\t ip[%d]: %llx\n",i,ip);
 					offset+=8;
 				}
 			}
@@ -785,7 +784,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 				int size;
 
 				memcpy(&size,&data[offset],sizeof(int));
-				if (!quiet) printf("\tPERF_SAMPLE_RAW, Raw length: %d\n",size);
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_RAW, Raw length: %d\n",size);
 				offset+=4;
 
 				if (!quiet) {
@@ -796,11 +795,11 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 						dump_raw_ibs_op(&data[offset],size);
 					}
 					else {
-						printf("\t\t");
+						fprintf(fp, "\t\t");
 						for(i=0;i<size;i++) {
-							printf("%d ",data[offset+i]);
+							fprintf(fp, "%d ",data[offset+i]);
 						}
-						printf("\n");
+						fprintf(fp, "\n");
 					}
 				}
 				offset+=size;
@@ -810,7 +809,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 				long long bnr;
 				memcpy(&bnr,&data[offset],sizeof(long long));
 				if (!quiet) {
-					printf("\tPERF_SAMPLE_BRANCH_STACK, branch_stack entries: %lld\n",bnr);
+					fprintf(fp, "\tPERF_SAMPLE_BRANCH_STACK, branch_stack entries: %lld\n",bnr);
 				}
 				offset+=8;
 
@@ -833,7 +832,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 					memcpy(&to,&data[offset],sizeof(long long));
 					offset+=8;
 					if (!quiet) {
-						printf("\t\t lbr[%d]: %llx %llx ",
+						fprintf(fp, "\t\t lbr[%d]: %llx %llx ",
 							i,from,to);
 		 			}
 
@@ -842,28 +841,28 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 					offset+=8;
 
 					if (!quiet) {
-						if (flags==0) printf("0");
+						if (flags==0) fprintf(fp, "0");
 
 						if (flags&1) {
-							printf("MISPREDICTED ");
+							fprintf(fp, "MISPREDICTED ");
 							flags&=~2;
 						}
 
 						if (flags&2) {
-							printf("PREDICTED ");
+							fprintf(fp, "PREDICTED ");
 							flags&=~2;
 						}
 
 						if (flags&4) {
-							printf("IN_TRANSACTION ");
+							fprintf(fp, "IN_TRANSACTION ");
 							flags&=~4;
 						}
 
 						if (flags&8) {
-							printf("TRANSACTION_ABORT ");
+							fprintf(fp, "TRANSACTION_ABORT ");
 							flags&=~8;
 						}
-						printf("\n");
+						fprintf(fp, "\n");
 					}
 	      			}
 	   		}
@@ -873,18 +872,18 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 
 				memcpy(&abi,&data[offset],sizeof(long long));
 				if (!quiet) {
-					printf("\tPERF_SAMPLE_REGS_USER, ABI: ");
+					fprintf(fp, "\tPERF_SAMPLE_REGS_USER, ABI: ");
 					if (abi==PERF_SAMPLE_REGS_ABI_NONE) printf ("PERF_SAMPLE_REGS_ABI_NONE");
-					if (abi==PERF_SAMPLE_REGS_ABI_32) printf("PERF_SAMPLE_REGS_ABI_32");
-					if (abi==PERF_SAMPLE_REGS_ABI_64) printf("PERF_SAMPLE_REGS_ABI_64");
-					printf("\n");
+					if (abi==PERF_SAMPLE_REGS_ABI_32) fprintf(fp, "PERF_SAMPLE_REGS_ABI_32");
+					if (abi==PERF_SAMPLE_REGS_ABI_64) fprintf(fp, "PERF_SAMPLE_REGS_ABI_64");
+					fprintf(fp, "\n");
 				}
 				offset+=8;
 
 				offset+=print_regs(quiet,abi,reg_mask,
 						&data[offset]);
 
-				if (!quiet) printf("\n");
+				if (!quiet) fprintf(fp, "\n");
 			}
 
 			if (sample_type & PERF_SAMPLE_REGS_INTR) {
@@ -892,18 +891,18 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 
 				memcpy(&abi,&data[offset],sizeof(long long));
 				if (!quiet) {
-					printf("\tPERF_SAMPLE_REGS_INTR, ABI: ");
+					fprintf(fp, "\tPERF_SAMPLE_REGS_INTR, ABI: ");
 					if (abi==PERF_SAMPLE_REGS_ABI_NONE) printf ("PERF_SAMPLE_REGS_ABI_NONE");
-					if (abi==PERF_SAMPLE_REGS_ABI_32) printf("PERF_SAMPLE_REGS_ABI_32");
-					if (abi==PERF_SAMPLE_REGS_ABI_64) printf("PERF_SAMPLE_REGS_ABI_64");
-					printf("\n");
+					if (abi==PERF_SAMPLE_REGS_ABI_32) fprintf(fp, "PERF_SAMPLE_REGS_ABI_32");
+					if (abi==PERF_SAMPLE_REGS_ABI_64) fprintf(fp, "PERF_SAMPLE_REGS_ABI_64");
+					fprintf(fp, "\n");
 				}
 				offset+=8;
 
 				offset+=print_regs(quiet,abi,reg_mask,
 						&data[offset]);
 
-				if (!quiet) printf("\n");
+				if (!quiet) fprintf(fp, "\n");
 			}
 
 			if (sample_type & PERF_SAMPLE_STACK_USER) {
@@ -912,7 +911,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 				int k;
 
 				memcpy(&size,&data[offset],sizeof(long long));
-				if (!quiet) printf("\tPERF_SAMPLE_STACK_USER, Requested size: %lld\n",size);
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_STACK_USER, Requested size: %lld\n",size);
 				offset+=8;
 
 				stack_data=malloc(size);
@@ -920,131 +919,131 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 				offset+=size;
 
 				memcpy(&dyn_size,&data[offset],sizeof(long long));
-				if (!quiet) printf("\t\tDynamic (used) size: %lld\n",dyn_size);
+				if (!quiet) fprintf(fp, "\t\tDynamic (used) size: %lld\n",dyn_size);
 				offset+=8;
 
-				if (!quiet) printf("\t\t");
+				if (!quiet) fprintf(fp, "\t\t");
 				for(k=0;k<dyn_size;k+=4) {
-					if (!quiet) printf("0x%x ",stack_data[k]);
+					if (!quiet) fprintf(fp, "0x%x ",stack_data[k]);
 				}
 
 				free(stack_data);
 
-				if (!quiet) printf("\n");
+				if (!quiet) fprintf(fp, "\n");
 			}
 
 			if (sample_type & PERF_SAMPLE_WEIGHT) {
 				long long weight;
 
 				memcpy(&weight,&data[offset],sizeof(long long));
-				if (!quiet) printf("\tPERF_SAMPLE_WEIGHT, Weight: %lld ",weight);
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_WEIGHT, Weight: %lld ",weight);
 				offset+=8;
 
-				if (!quiet) printf("\n");
+				if (!quiet) fprintf(fp, "\n");
 			}
 
 			if (sample_type & PERF_SAMPLE_DATA_SRC) {
 				long long src;
 
 				memcpy(&src,&data[offset],sizeof(long long));
-				if (!quiet) printf("\tPERF_SAMPLE_DATA_SRC, Raw: %llx\n",src);
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_DATA_SRC, Raw: %llx\n",src);
 				offset+=8;
 
 				if (!quiet) {
-					if (src!=0) printf("\t\t");
+					if (src!=0) fprintf(fp, "\t\t");
 					if (src & (PERF_MEM_OP_NA<<PERF_MEM_OP_SHIFT))
-						printf("Op Not available ");
+						fprintf(fp, "Op Not available ");
 					if (src & (PERF_MEM_OP_LOAD<<PERF_MEM_OP_SHIFT))
-						printf("Load ");
+						fprintf(fp, "Load ");
 					if (src & (PERF_MEM_OP_STORE<<PERF_MEM_OP_SHIFT))
-						printf("Store ");
+						fprintf(fp, "Store ");
 					if (src & (PERF_MEM_OP_PFETCH<<PERF_MEM_OP_SHIFT))
-						printf("Prefetch ");
+						fprintf(fp, "Prefetch ");
 					if (src & (PERF_MEM_OP_EXEC<<PERF_MEM_OP_SHIFT))
-						printf("Executable code ");
+						fprintf(fp, "Executable code ");
 
 					if (src & (PERF_MEM_LVL_NA<<PERF_MEM_LVL_SHIFT))
-						printf("Level Not available ");
+						fprintf(fp, "Level Not available ");
 					if (src & (PERF_MEM_LVL_HIT<<PERF_MEM_LVL_SHIFT))
-						printf("Hit ");
+						fprintf(fp, "Hit ");
 					if (src & (PERF_MEM_LVL_MISS<<PERF_MEM_LVL_SHIFT))
-						printf("Miss ");
+						fprintf(fp, "Miss ");
 					if (src & (PERF_MEM_LVL_L1<<PERF_MEM_LVL_SHIFT))
-						printf("L1 cache ");
+						fprintf(fp, "L1 cache ");
 					if (src & (PERF_MEM_LVL_LFB<<PERF_MEM_LVL_SHIFT))
-						printf("Line fill buffer ");
+						fprintf(fp, "Line fill buffer ");
 					if (src & (PERF_MEM_LVL_L2<<PERF_MEM_LVL_SHIFT))
-						printf("L2 cache ");
+						fprintf(fp, "L2 cache ");
 					if (src & (PERF_MEM_LVL_L3<<PERF_MEM_LVL_SHIFT))
-						printf("L3 cache ");
+						fprintf(fp, "L3 cache ");
 					if (src & (PERF_MEM_LVL_LOC_RAM<<PERF_MEM_LVL_SHIFT))
-						printf("Local DRAM ");
+						fprintf(fp, "Local DRAM ");
 					if (src & (PERF_MEM_LVL_REM_RAM1<<PERF_MEM_LVL_SHIFT))
-						printf("Remote DRAM 1 hop ");
+						fprintf(fp, "Remote DRAM 1 hop ");
 					if (src & (PERF_MEM_LVL_REM_RAM2<<PERF_MEM_LVL_SHIFT))
-						printf("Remote DRAM 2 hops ");
+						fprintf(fp, "Remote DRAM 2 hops ");
 					if (src & (PERF_MEM_LVL_REM_CCE1<<PERF_MEM_LVL_SHIFT))
-						printf("Remote cache 1 hop ");
+						fprintf(fp, "Remote cache 1 hop ");
 					if (src & (PERF_MEM_LVL_REM_CCE2<<PERF_MEM_LVL_SHIFT))
-						printf("Remote cache 2 hops ");
+						fprintf(fp, "Remote cache 2 hops ");
 					if (src & (PERF_MEM_LVL_IO<<PERF_MEM_LVL_SHIFT))
-						printf("I/O memory ");
+						fprintf(fp, "I/O memory ");
 					if (src & (PERF_MEM_LVL_UNC<<PERF_MEM_LVL_SHIFT))
-						printf("Uncached memory ");
+						fprintf(fp, "Uncached memory ");
 
 					if (src & (PERF_MEM_SNOOP_NA<<PERF_MEM_SNOOP_SHIFT))
-						printf("Snoop Not available ");
+						fprintf(fp, "Snoop Not available ");
 					if (src & (PERF_MEM_SNOOP_NONE<<PERF_MEM_SNOOP_SHIFT))
-						printf("No snoop ");
+						fprintf(fp, "No snoop ");
 					if (src & (PERF_MEM_SNOOP_HIT<<PERF_MEM_SNOOP_SHIFT))
-						printf("Snoop hit ");
+						fprintf(fp, "Snoop hit ");
 					if (src & (PERF_MEM_SNOOP_MISS<<PERF_MEM_SNOOP_SHIFT))
-						printf("Snoop miss ");
+						fprintf(fp, "Snoop miss ");
 					if (src & (PERF_MEM_SNOOP_HITM<<PERF_MEM_SNOOP_SHIFT))
-						printf("Snoop hit modified ");
+						fprintf(fp, "Snoop hit modified ");
 
 					if (src & (PERF_MEM_LOCK_NA<<PERF_MEM_LOCK_SHIFT))
-						printf("Locks Not available ");
+						fprintf(fp, "Locks Not available ");
 					if (src & (PERF_MEM_LOCK_LOCKED<<PERF_MEM_LOCK_SHIFT))
-						printf("Locked transaction ");
+						fprintf(fp, "Locked transaction ");
 
 					if (src & (PERF_MEM_TLB_NA<<PERF_MEM_TLB_SHIFT))
-						printf("TLB Not available ");
+						fprintf(fp, "TLB Not available ");
 					if (src & (PERF_MEM_TLB_HIT<<PERF_MEM_TLB_SHIFT))
-						printf("Hit ");
+						fprintf(fp, "Hit ");
 					if (src & (PERF_MEM_TLB_MISS<<PERF_MEM_TLB_SHIFT))
-						printf("Miss ");
+						fprintf(fp, "Miss ");
 					if (src & (PERF_MEM_TLB_L1<<PERF_MEM_TLB_SHIFT))
-						printf("Level 1 TLB ");
+						fprintf(fp, "Level 1 TLB ");
 					if (src & (PERF_MEM_TLB_L2<<PERF_MEM_TLB_SHIFT))
-						printf("Level 2 TLB ");
+						fprintf(fp, "Level 2 TLB ");
 					if (src & (PERF_MEM_TLB_WK<<PERF_MEM_TLB_SHIFT))
-						printf("Hardware walker ");
+						fprintf(fp, "Hardware walker ");
 					if (src & ((long long)PERF_MEM_TLB_OS<<PERF_MEM_TLB_SHIFT))
-						printf("OS fault handler ");
+						fprintf(fp, "OS fault handler ");
 				}
 
-				if (!quiet) printf("\n");
+				if (!quiet) fprintf(fp, "\n");
 			}
 
 			if (sample_type & PERF_SAMPLE_IDENTIFIER) {
 				long long abi;
 
 				memcpy(&abi,&data[offset],sizeof(long long));
-				if (!quiet) printf("\tPERF_SAMPLE_IDENTIFIER, Raw length: %lld\n",abi);
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_IDENTIFIER, Raw length: %lld\n",abi);
 				offset+=8;
 
-				if (!quiet) printf("\n");
+				if (!quiet) fprintf(fp, "\n");
 			}
 
 			if (sample_type & PERF_SAMPLE_TRANSACTION) {
 				long long abi;
 
 				memcpy(&abi,&data[offset],sizeof(long long));
-				if (!quiet) printf("\tPERF_SAMPLE_TRANSACTION, Raw length: %lld\n",abi);
+				if (!quiet) fprintf(fp, "\tPERF_SAMPLE_TRANSACTION, Raw length: %lld\n",abi);
 				offset+=8;
 
-				if (!quiet) printf("\n");
+				if (!quiet) fprintf(fp, "\n");
 			}
 			break;
 
@@ -1054,28 +1053,28 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			long long sample_id;
 
 			memcpy(&aux_offset,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tAUX_OFFSET: %lld\n",aux_offset);
+			if (!quiet) fprintf(fp, "\tAUX_OFFSET: %lld\n",aux_offset);
 			offset+=8;
 
 			memcpy(&aux_size,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tAUX_SIZE: %lld\n",aux_size);
+			if (!quiet) fprintf(fp, "\tAUX_SIZE: %lld\n",aux_size);
 			offset+=8;
 
 			memcpy(&flags,&data[offset],sizeof(long long));
 			if (!quiet) {
-				printf("\tFLAGS: %llx ",flags);
+				fprintf(fp, "\tFLAGS: %llx ",flags);
 				if (flags & PERF_AUX_FLAG_TRUNCATED) {
-					printf("FLAG_TRUNCATED ");
+					fprintf(fp, "FLAG_TRUNCATED ");
 				}
 				if (flags & PERF_AUX_FLAG_OVERWRITE) {
-					printf("FLAG_OVERWRITE ");
+					fprintf(fp, "FLAG_OVERWRITE ");
 				}
-				printf("\n");
+				fprintf(fp, "\n");
 			}
 			offset+=8;
 
 			memcpy(&sample_id,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tSAMPLE_ID: %lld\n",sample_id);
+			if (!quiet) fprintf(fp, "\tSAMPLE_ID: %lld\n",sample_id);
 			offset+=8;
 
 			}
@@ -1086,11 +1085,11 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			int pid,tid;
 
 			memcpy(&pid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tPID: %d\n",pid);
+			if (!quiet) fprintf(fp, "\tPID: %d\n",pid);
 			offset+=4;
 
 			memcpy(&tid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tTID: %d\n",tid);
+			if (!quiet) fprintf(fp, "\tTID: %d\n",tid);
 			offset+=4;
 			}
 			break;
@@ -1100,11 +1099,11 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			long long lost,sample_id;
 
 			memcpy(&lost,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tLOST: %lld\n",lost);
+			if (!quiet) fprintf(fp, "\tLOST: %lld\n",lost);
 			offset+=8;
 
 			memcpy(&sample_id,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tSAMPLE_ID: %lld\n",sample_id);
+			if (!quiet) fprintf(fp, "\tSAMPLE_ID: %lld\n",sample_id);
 			offset+=8;
 			}
 			break;
@@ -1114,7 +1113,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			long long sample_id;
 
 			memcpy(&sample_id,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tSAMPLE_ID: %lld\n",sample_id);
+			if (!quiet) fprintf(fp, "\tSAMPLE_ID: %lld\n",sample_id);
 			offset+=8;
 			}
 			break;
@@ -1125,22 +1124,22 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			long long sample_id;
 
 			memcpy(&prev_pid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tPREV_PID: %d\n",prev_pid);
+			if (!quiet) fprintf(fp, "\tPREV_PID: %d\n",prev_pid);
 			offset+=4;
 
 			memcpy(&prev_tid,&data[offset],sizeof(int));
-			if (!quiet) printf("\tPREV_TID: %d\n",prev_tid);
+			if (!quiet) fprintf(fp, "\tPREV_TID: %d\n",prev_tid);
 			offset+=4;
 
 			memcpy(&sample_id,&data[offset],sizeof(long long));
-			if (!quiet) printf("\tSAMPLE_ID: %lld\n",sample_id);
+			if (!quiet) fprintf(fp, "\tSAMPLE_ID: %lld\n",sample_id);
 			offset+=8;
 			}
 			break;
 
 
 		default:
-			if (!quiet) printf("\tUnknown type %d\n",event->type);
+			if (!quiet) fprintf(fp, "\tUnknown type %d\n",event->type);
 			/* Probably best to just skip it all */
 			offset=size;
 
