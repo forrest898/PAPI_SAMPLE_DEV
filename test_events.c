@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
 
 	PAPI_sample_start(1);
 
-	for(i = 0; i < 1; i++) {
+	for(i = 0; i < 100; i++) {
 		naive_matrix_multiply(0);
 	}
 

@@ -1,3 +1,4 @@
+nameevents
 nameevent
 a.out
 PAPI_sample
@@ -7,4 +8,4 @@ gen_defines
 *.o
 gen_list
 test_events
-wowie
+wowie*
