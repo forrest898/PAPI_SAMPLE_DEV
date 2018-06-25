@@ -109,29 +109,6 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
         exit(1);
     }
 
-//	pe = setup_perf(EventCodes[0], sample_type, sample_period, firstEvent);
-	/*
-	fd1=perf_event_open(&pe,0,-1,-1,0);
-	if (fd1<0) {
-		if (!quiet) {
-			fprintf(stderr,"Problem opening leader %s\n",
-			strerror(errno));
-			fprintf(stderr,"Trying without branches\n");
-		}
-		sample_type&=~PERF_SAMPLE_BRANCH_STACK;
-		pe.sample_type=sample_type;
-		fd1=perf_event_open(&pe,0,-1,-1,0);
-		if (fd1<0) {
-			if (!quiet) {
-				fprintf(stderr,"Error opening leader %s\n",
-					strerror(errno));
-			}
-			test_fail(test_string);
-		}
-	}
-*/
-
-
     for(i = 0; i < NumEvents; i++) {
 
         memset(&pe,0,sizeof(struct perf_event_attr));
@@ -188,11 +165,6 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
 	fcntl(fds[0], F_SETSIG, SIGIO);
 	fcntl(fds[0], F_SETOWN,getpid());
 
-
-	//ioctl(fds[0], PERF_EVENT_IOC_RESET, 0);
-
-	//ret=ioctl(fds[0], PERF_EVENT_IOC_ENABLE,0);
-
     return PAPI_OK;
 
 
@@ -243,17 +215,7 @@ int PAPI_sample_stop(int Eventset) {
 
  	ret=ioctl(fds[0], PERF_EVENT_IOC_DISABLE, 0);
 
-// prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
-	// sample_type,read_format,
-	 //0, /* reg_mask */
-//		NULL, /*validate */
-//		quiet,
-//		NULL, /* events read */
-//		RAW_NONE);
-
 	munmap(our_mmap, 1+MMAP_DATA_SIZE*getpagesize());
-		//munmap(our_mmap,mmap_pages*4096);
-
 
     return PAPI_OK;
 
@@ -273,20 +235,24 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
     pe.type=PERF_TYPE_RAW;
     pe.size=sizeof(struct perf_event_attr);
 
-    if(firstEvent != 0) {
+    if(firstEvent) {
 
         pe.sample_period=sample_period;
-
+		pe.sample_type=sample_type;
+		pe.read_format=read_format;
+	    pe.disabled=1;
+		pe.wakeup_events=1;
+	    pe.pinned=1;
     }
+	else {
+		pe.sample_type=PERF_SAMPLE_RAW;
+		pe.read_format=PERF_FORMAT_GROUP|PERF_FORMAT_ID;
+	    pe.disabled=0;
+	}
 
-    pe.sample_type=sample_type;
-
-    pe.read_format=read_format;
-    pe.disabled=1;
-    pe.pinned=1;
     pe.exclude_kernel=1;
     pe.exclude_hv=1;
-    pe.wakeup_events=1;
+
     //pe.precise_ip=1;
 
   /* Prototype for Skylake machines */

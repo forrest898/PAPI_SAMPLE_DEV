@@ -2,7 +2,6 @@ include ../Makefile.globals.inc
 
 TARGET = prog
 LIBS = -lm -lpfm
-#CC = gcc
 CFLAGS += -g -Wall -I../include
 
 .PHONY: clean all default

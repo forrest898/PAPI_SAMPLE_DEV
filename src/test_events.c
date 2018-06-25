@@ -74,6 +74,7 @@ int main(int argc, char** argv) {
 
 	//set the sampling event
 	*ev = conv;
+	//ev[1] = 36;
 
 
 	//printf("%s", argv[1]);
@@ -84,15 +85,19 @@ int main(int argc, char** argv) {
 
 
 	// initialize sampling
-	ret = PAPI_sample_init(1, ev, 1, sample_type, 100000, filename);
+	ret = PAPI_sample_init(1, ev, 2, sample_type, 100000, filename);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
 	}
 
-	PAPI_sample_start(1);
+	ret = PAPI_sample_start(1);
+	if(ret != PAPI_OK) {
+		printf("PANIC\n");
+		exit(1);
+	}
 
-	for(i = 0; i < 1; i++) {
+	for(i = 0; i < 100; i++) {
 		naive_matrix_multiply(0);
 	}
 

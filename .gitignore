@@ -7,4 +7,5 @@ gen_defines
 *.o
 gen_list
 test_events
-wowie
+src/wowie*
+wowie*
