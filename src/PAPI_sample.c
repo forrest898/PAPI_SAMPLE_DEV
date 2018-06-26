@@ -80,12 +80,9 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
                         int sample_type, int sample_period, char* filename) {
 
-    int ret, i, firstEvent;
-    //int* fds;
-	int fd1;
+    int i, firstEvent;
     int mmap_pages=1+MMAP_DATA_SIZE;
     int quiet = 0;
-    int read_format;
 
     struct perf_event_attr pe;
     struct sigaction sa;
@@ -202,21 +199,24 @@ int PAPI_sample_start(int Eventset) {
 int PAPI_sample_stop(int Eventset, int NumEvents) {
 
     int ret, i;
+	/*
 	int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
 			PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
 			PERF_SAMPLE_ID | PERF_SAMPLE_CPU | PERF_SAMPLE_PERIOD |
 			PERF_SAMPLE_STREAM_ID | PERF_SAMPLE_RAW |
 			PERF_SAMPLE_DATA_SRC;
-
+	*/
     ret=ioctl(fds[0], PERF_EVENT_IOC_REFRESH,0);
     printf("File ready for parsing\n");
-
+	/*
  	int read_format = PERF_FORMAT_GROUP |
 	 	PERF_FORMAT_ID |
 	 	PERF_FORMAT_TOTAL_TIME_ENABLED |
 	 	PERF_FORMAT_TOTAL_TIME_RUNNING;
-
+	*/
  	ret=ioctl(fds[0], PERF_EVENT_IOC_DISABLE, 0);
+
+
 
 	for(i=(NumEvents-1); i >= 0; i--) {
 		printf("Closing fds[%d]\n", i);
@@ -226,6 +226,7 @@ int PAPI_sample_stop(int Eventset, int NumEvents) {
 	munmap(our_mmap, 1+MMAP_DATA_SIZE*getpagesize());
 
 	free(fds);
+
     return PAPI_OK;
 
 }
@@ -303,21 +304,25 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
 			pe.precise_ip=0;
 			break;
 		case	PAPI_FRONTEND_RETIRED_ITLB_MISS	:
-			pe.config=0x5101c614;
-			//pe.config2=0x14;
+			pe.config=0x5101c6;
+			pe.config1=0x14;
+			pe.precise_ip=0;
 			break;
 		case	PAPI_FRONTEND_RETIRED_STLB_MISS	:
-			pe.config=0x5101c615;
-			//pe.config2=0x15;
+			pe.config=0x5101c6;
+			pe.config1=0x15;
+			pe.precise_ip=0;
 			break;
 		case	PAPI_FRONTEND_RETIRED_L1I_MISS	:
 			//pe.precise_ip=1;
-			pe.config=0x5101c612;
-			//pe.config2=0x12;
+			pe.config=0x5101c6;
+			pe.config1=0x12;
+			pe.precise_ip=0;
 			break;
 		case	PAPI_FRONTEND_RETIRED_L2_MISS	:
-			pe.config=0x5101c613;
-			//pe.config2=0x13;
+			pe.config=0x5101c6;
+			pe.config1=0x13;
+			pe.precise_ip=0;
 			break;
 		case 	PAPI_FRONTEND_RETIRED_LATENCY_GE_128:
 			pe.config=0x5101c6;
@@ -325,6 +330,7 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
 			break;
 		case	PAPI_MEM_INST_RETIRED_STLB_MISS_LOADS	:
 			pe.config=0x5111d0;
+			pe.precise_ip=0;
 			break;
 		case	PAPI_MEM_INST_RETIRED_STLB_MISS_STORES	:
 			pe.config=0x5112d0;
@@ -391,6 +397,7 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
 			break;
 		case	PAPI_RTM_RETIRED_ABORTED	:
 			pe.config=0x5104c9;
+			//pe.precise_ip=1;
 			break;
 
         default:

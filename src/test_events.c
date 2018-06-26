@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	for(i = 0; i < 10; i++) {
+	for(i = 0; i < 3; i++) {
 		naive_matrix_multiply(0);
 	}
 
