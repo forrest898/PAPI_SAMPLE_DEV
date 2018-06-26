@@ -292,25 +292,25 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
 			pe.config=0x5120c5;
 			break;
 		case	PAPI_FRONTEND_RETIRED_DSB_MISS	:
-			pe.config=0x5101c6;
-			pe.config2=0x11;
+			pe.config=0x5101c611;
+			//pe.config2=0x11;
 			break;
 		case	PAPI_FRONTEND_RETIRED_ITLB_MISS	:
 			pe.config=0x5101c614;
 			//pe.config2=0x14;
 			break;
 		case	PAPI_FRONTEND_RETIRED_STLB_MISS	:
-			pe.config=0x5101c6;
-			pe.config2=0x15;
+			pe.config=0x5101c615;
+			//pe.config2=0x15;
 			break;
 		case	PAPI_FRONTEND_RETIRED_L1I_MISS	:
-			pe.precise_ip=1;
-			pe.config=0x5101c6;
-			pe.config2=0x12;
+			//pe.precise_ip=1;
+			pe.config=0x5101c612;
+			//pe.config2=0x12;
 			break;
 		case	PAPI_FRONTEND_RETIRED_L2_MISS	:
-			pe.config=0x5101c6;
-			pe.config2=0x13;
+			pe.config=0x5101c613;
+			//pe.config2=0x13;
 			break;
 		case	PAPI_MEM_INST_RETIRED_STLB_MISS_LOADS	:
 			pe.config=0x5111d0;
