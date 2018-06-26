@@ -123,7 +123,7 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
 				printf("Value of i is %d\n \
 						Eventcode is 0x%x\n", i, pe.config);
 			}
-			pe.config=0x511ff1;
+			//pe.config=0x511ff1;
             fds[0] = perf_event_open(&pe,0,-1,-1,0);
             if (fds[0] < 0) {
 	    		if (!quiet) {
@@ -195,13 +195,14 @@ int PAPI_sample_start(int Eventset) {
 
     }
 
+
     return PAPI_OK;
 
 }
 
-int PAPI_sample_stop(int Eventset) {
+int PAPI_sample_stop(int Eventset, int NumEvents) {
 
-    int ret;
+    int ret, i;
 	int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
 			PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
 			PERF_SAMPLE_ID | PERF_SAMPLE_CPU | PERF_SAMPLE_PERIOD |
@@ -218,8 +219,14 @@ int PAPI_sample_stop(int Eventset) {
 
  	ret=ioctl(fds[0], PERF_EVENT_IOC_DISABLE, 0);
 
+	for(i=(NumEvents-1); i >= 0; i--) {
+		printf("Closing fds[%d]\n", i);
+		close(fds[i]);
+	}
+
 	munmap(our_mmap, 1+MMAP_DATA_SIZE*getpagesize());
 
+	free(fds);
     return PAPI_OK;
 
 }

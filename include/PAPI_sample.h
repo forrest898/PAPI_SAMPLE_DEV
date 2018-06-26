@@ -61,6 +61,6 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
 
 int PAPI_sample_start(int Eventset);
 
-int PAPI_sample_stop(int Eventset);
+int PAPI_sample_stop(int Eventset, int NumEvents);
 
 #endif

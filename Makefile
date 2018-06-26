@@ -8,3 +8,4 @@ clean: clean-local
 
 clean-local:
 		@- $(RM) *~
+		@- $(RM) wowie*

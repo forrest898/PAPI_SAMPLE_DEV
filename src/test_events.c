@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 	int ret, conv, i;
 	int *ev;
 	char *filename2 = "wowie";
-	FILE *fp;
+	// /FILE *fp;
 
 	if(argc != 2) {
 		printf("Please pass the req'd args\n");
@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 	ev = (int *)malloc(sizeof(int)*1);
 
 	//set the sampling event
-	ev[0] = conv;
+	*ev = conv;
 	//ev[1] = 36;
 
 	// initialize sampling
@@ -91,8 +91,13 @@ int main(int argc, char** argv) {
 
 	//printf("Yo yo yo \n");
 
-	PAPI_sample_stop(1);
+	ret = PAPI_sample_stop(1, 1);
+	if(ret != PAPI_OK) {
+		printf("PANIC\n");
+		exit(1);
+	}
 
+	free(ev);
 	return 0;
 
 }
