@@ -123,7 +123,6 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
 				printf("Value of i is %d\n \
 						Eventcode is 0x%x\n", i, pe.config);
 			}
-			//pe.config=0x511ff1;
             fds[0] = perf_event_open(&pe,0,-1,-1,0);
             if (fds[0] < 0) {
 	    		if (!quiet) {
@@ -299,8 +298,9 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
 			pe.config=0x5120c5;
 			break;
 		case	PAPI_FRONTEND_RETIRED_DSB_MISS	:
-			pe.config=0x5101c611;
-			//pe.config2=0x11;
+			pe.config=0x5101c6;
+			pe.config1=0x11;
+			pe.precise_ip=0;
 			break;
 		case	PAPI_FRONTEND_RETIRED_ITLB_MISS	:
 			pe.config=0x5101c614;
