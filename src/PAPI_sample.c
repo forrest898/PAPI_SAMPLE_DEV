@@ -296,8 +296,8 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
 			pe.config2=0x11;
 			break;
 		case	PAPI_FRONTEND_RETIRED_ITLB_MISS	:
-			pe.config=0x5101c6;
-			pe.config2=0x14;
+			pe.config=0x5101c614;
+			//pe.config2=0x14;
 			break;
 		case	PAPI_FRONTEND_RETIRED_STLB_MISS	:
 			pe.config=0x5101c6;
