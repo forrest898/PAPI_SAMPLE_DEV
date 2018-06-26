@@ -312,6 +312,10 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
 			pe.config=0x5101c613;
 			//pe.config2=0x13;
 			break;
+		case 	PAPI_FRONTEND_RETIRED_LATENCY_GE_128:
+			pe.config=0x5101c6;
+			pe.config2=0x408006;
+			break;
 		case	PAPI_MEM_INST_RETIRED_STLB_MISS_LOADS	:
 			pe.config=0x5111d0;
 			break;
@@ -383,7 +387,7 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
 			break;
 
         default:
-            printf("EventCode not found in PEBS/IBS event! Enter a valid code!");
+            printf("EventCode not found in PEBS/IBS event! Enter a valid code!\n");
             //return -1;
             break;
     }

@@ -66,14 +66,14 @@ int main(int argc, char** argv) {
 	conv = atoi(argv[1]);
 	printf("%d\n", conv);
 
-	ev = (int *)malloc(sizeof(int)*2);
+	ev = (int *)malloc(sizeof(int)*1);
 
 	//set the sampling event
 	ev[0] = conv;
-	ev[1] = 36;
+	//ev[1] = 36;
 
 	// initialize sampling
-	ret = PAPI_sample_init(1, ev, 2, sample_type, 100000, filename);
+	ret = PAPI_sample_init(1, ev, 1, sample_type, 100000, filename);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
