@@ -18,12 +18,16 @@
 #include <err.h>
 #include <perfmon/pfmlib.h>
 #include <inttypes.h>
+#include <papi.h>
 #include "char_replace.h"
+#include "perf_event.h"
+#include "test_utils.h"
+#include "perf_helpers.h"
 
 
 int main(int argc, char** argv) {
 
-    pfm_pmu_encode_arg_t raw;
+    pfm_perf_encode_arg_t raw;
     int ret, i;
     char *event = "BR_INST_RETIRED.ALL_BRANCHES";
 
@@ -32,7 +36,7 @@ int main(int argc, char** argv) {
     uint64_t len = 0;
     int32_t read;
 
-    fp = fopen("LISTOFEVENTS", "r");
+    fp = fopen("NEWEVS", "r");
     if(fp == NULL) {
         printf("Error opening list of events\n");
         return -1;
@@ -54,7 +58,7 @@ int main(int argc, char** argv) {
 
         //printf("\t\t\t//%s\n", event);
 
-        ret = pfm_get_os_event_encoding(event, PFM_PLM3, PFM_OS_NONE, &raw);
+        ret = pfm_get_os_event_encoding(event, PFM_PLM3, PERF_OS_PERF_EVENT, &raw);
         if (ret != PFM_SUCCESS)
   // err(1, " cannot get encoding %s", pfm_strerror(ret));
             printf("gen_codes can't get encoding %s\n",  pfm_strerror(ret));

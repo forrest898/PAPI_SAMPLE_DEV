@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	ret = PAPI_sample_start(1);
+	//ret = PAPI_sample_start(1);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
 
 	//printf("Yo yo yo \n");
 
-	ret = PAPI_sample_stop(1, 1);
+//	ret = PAPI_sample_stop(1, 1);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
