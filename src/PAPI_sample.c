@@ -105,7 +105,7 @@ int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 
     firstEvent = 1;
 
-    if(!quiet) printf("This begins the implementation of complex sampling with PAPI.\n");
+    //if(!quiet) printf("This begins the implementation of complex sampling with PAPI.\n");
 
     memset(&sa, 0, sizeof(struct sigaction));
     sa.sa_sigaction = PAPI_sample_handler;

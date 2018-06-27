@@ -13,7 +13,7 @@ PROGRAM_LIST = \
 	PAPI_sample \
 	gen_defines \
 
-all: gen_codes nameevents gen_defines gen_list test_events
+all: gen_codes nameevents gen_defines gen_list test_events matrix_mul
 
 gen_codes:	gen_codes.o char_replace.o
 			$(CC) -o gen_codes gen_codes.o char_replace.o \
@@ -37,6 +37,9 @@ test_events:	test_events.o PAPI_sample.o instructions_testcode.o \
 				$(CC) -o test_events test_events.o PAPI_sample.o \
 				instructions_testcode.o perf_helpers.o test_utils.o \
 				parse_record.o matrix_multiply.o $(LIBS)
+
+matrix_mul:	matrix_mul.o
+			$(CC) -o matrix_mul matrix_mul.o matrix_multiply.o $(LIBS)
 
 #$(PROGRAM_LIST): %: %.c
 #	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
@@ -76,6 +79,9 @@ parse_record.o: parse_record.c
 
 matrix_multiply.o: matrix_multiply.c
 	$(CC) $(CFLAGS) -c matrix_multiply.c
+
+matrix_mul.o: matrix_mul.c
+	$(CC) $(CFLAGS) -c matrix_mul.c
 
 clean: clean-local
 	@- $(RM) *.o
