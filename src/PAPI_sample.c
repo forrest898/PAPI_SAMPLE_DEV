@@ -205,7 +205,7 @@ int PAPI_sample_start(int Eventset) {
 
 int PAPI_sample_stop(int Eventset, int NumEvents) {
 
-    int ret, i;
+    int ret, i, count;
 	/*
 	int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
 			PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
@@ -223,6 +223,9 @@ int PAPI_sample_stop(int Eventset, int NumEvents) {
 	*/
  	ret=ioctl(fds[0], PERF_EVENT_IOC_DISABLE, 0);
 
+	read(fds[0], &count, sizeof(long long));
+
+	printf("Count of conuts: %lld", count);
 
 
 	for(i=(NumEvents-1); i >= 0; i--) {
@@ -271,6 +274,7 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 	    attr.disabled=1;
 		attr.wakeup_events=1;
 	    attr.pinned=1;
+		attr.precise_ip=1;
     }
 	else {
 		attr.sample_type=PERF_SAMPLE_RAW;
