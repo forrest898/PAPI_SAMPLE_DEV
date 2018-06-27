@@ -273,7 +273,7 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 		attr.read_format=read_format;
 	    attr.disabled=1;
 		attr.wakeup_events=1;
-	    attr.pinned=1;
+	    attr.pinned=0;
 		attr.precise_ip=0;
     }
 	else {

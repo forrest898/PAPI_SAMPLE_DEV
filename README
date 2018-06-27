@@ -1,13 +1,20 @@
 This repository represents the first attempt to develop sampling with PAPI.
 
-As of 2:56pm, 
+As of 2:56pm,
 about half of the events for the Skylake processor series are working with an i7-6820HQ on a lenovo
-t460p with ubuntu 16.04 LTS 
+t460p with ubuntu 16.04 LTS
 
 6/25
-about to completely reorganize the directory and add a decent makefile system (maybe....) 
+about to completely reorganize the directory and add a decent makefile system (maybe....)
 here goes nothing...
 
 6/27
-As of right now it appears sampling only works for 19 of the specified 50 events that PEBS is supposed to be supported for. It's unclear whether I'm using the perf_event_open interface wrong or if these events just dont work.
- 
+As of right now it appears sampling only works for 19 of the specified 50 events
+that PEBS is supposed to be supported for. It's unclear whether I'm using the
+erf_event_open interface wrong or if these events just dont work.
+
+As the code stands right now, it takes the INTEL name for sampling events and
+feeds them into libpfm in order to generate perf_event_attr structures, which
+are modified slightly before use. As it progresses, the code should take generic
+PAPI sampling names; these can then be used to translate to the INTEL name,
+which can be fed to the call to pfm_get_os_event_encoding. 
