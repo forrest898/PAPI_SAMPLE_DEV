@@ -1,7 +1,7 @@
 include ../Makefile.globals.inc
 
 TARGET = prog
-LIBS = -lm -lpfm 
+LIBS = -lm -lpfm
 CFLAGS += -g -Wall -I../include
 
 .PHONY: clean all default
@@ -36,7 +36,7 @@ test_events:	test_events.o PAPI_sample.o instructions_testcode.o \
 				matrix_multiply.o
 				$(CC) -o test_events test_events.o PAPI_sample.o \
 				instructions_testcode.o perf_helpers.o test_utils.o \
-				parse_record.o matrix_multiply.o
+				parse_record.o matrix_multiply.o $(LIBS)
 
 #$(PROGRAM_LIST): %: %.c
 #	$(CC) $(CFLAGS) -o $@ $< $(LIBS)

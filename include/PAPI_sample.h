@@ -53,7 +53,7 @@
 #define PAPI_INST_RETIRED_TOTAL_INST    50
 
 
-int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
+int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
     int sample_type, int sample_period, char* filename);
 
 struct perf_event_attr setup_perf(int EventCode, int sample_type,
@@ -62,5 +62,8 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
 int PAPI_sample_start(int Eventset);
 
 int PAPI_sample_stop(int Eventset, int NumEvents);
+
+struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
+                                    int sample_period, int firstEvent);
 
 #endif

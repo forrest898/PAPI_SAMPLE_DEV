@@ -17,8 +17,9 @@
 #include <asm/unistd.h>
 #include <sys/prctl.h>
 #include <papi.h>
-
-#include "perf_event.h"
+#include <perfmon/pfmlib.h>
+#include <perfmon/perf_event.h>
+#include <perfmon/pfmlib_perf_event.h>//#include "perf_event.h"
 #include "test_utils.h"
 #include "perf_helpers.h"
 //#include "instructions_testcode.h"
@@ -77,10 +78,10 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 }
 
 /* Base API for simple write-out results */
-int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
+int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
                         int sample_type, int sample_period, char* filename) {
 
-    int i, firstEvent;
+    int i, firstEvent, ret;
     int mmap_pages=1+MMAP_DATA_SIZE;
     int quiet = 0;
 
@@ -96,6 +97,12 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
 
      //quiet=test_quiet();
     fds = (int *)malloc(sizeof(int)*NumEvents);
+
+	ret = pfm_initialize();
+    if (ret != PFM_SUCCESS)
+        fprintf(stdout, "cannot initialize library %s", pfm_strerror(ret));
+
+
     firstEvent = 1;
 
     if(!quiet) printf("This begins the implementation of complex sampling with PAPI.\n");
@@ -112,8 +119,8 @@ int PAPI_sample_init(int Eventset, int* EventCodes, int NumEvents,
     for(i = 0; i < NumEvents; i++) {
 
         memset(&pe,0,sizeof(struct perf_event_attr));
-        pe = setup_perf(EventCodes[i], sample_type, sample_period, firstEvent);
-
+       //pe = setup_perf(EventCodes[i], sample_type, sample_period, firstEvent);
+		pe = new_setup_perf(EventCodes, sample_type, sample_period, firstEvent);
         if(firstEvent) {
 
 			if(DEBUG) {
@@ -228,6 +235,52 @@ int PAPI_sample_stop(int Eventset, int NumEvents) {
 	free(fds);
 
     return PAPI_OK;
+
+}
+
+struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
+                                    int sample_period, int firstEvent)  {
+
+	int ret;
+	int read_format = PERF_FORMAT_GROUP |
+        PERF_FORMAT_ID |
+        PERF_FORMAT_TOTAL_TIME_ENABLED |
+        PERF_FORMAT_TOTAL_TIME_RUNNING;
+
+	pfm_perf_encode_arg_t raw;
+	struct perf_event_attr attr;
+
+	memset(&raw, 0, sizeof(raw));
+	memset(&attr, 0, sizeof(attr));
+
+ 	raw.size = sizeof(raw);
+ 	raw.attr = &attr;
+
+    ret = pfm_get_os_event_encoding(EventCode, PFM_PLM3, PFM_OS_PERF_EVENT, &raw);
+
+	if (ret != PFM_SUCCESS) {
+		printf("gen_codes can't get encoding %s\n",  pfm_strerror(ret));
+		exit(1);
+	}
+
+	if(firstEvent) {
+
+        attr.sample_period=sample_period;
+		attr.sample_type=sample_type;
+		attr.read_format=read_format;
+	    attr.disabled=1;
+		attr.wakeup_events=1;
+	    attr.pinned=1;
+    }
+	else {
+		attr.sample_type=PERF_SAMPLE_RAW;
+		attr.read_format=PERF_FORMAT_GROUP|PERF_FORMAT_ID;
+	    attr.disabled=0;
+	}
+
+	return attr;
+
+
 
 }
 

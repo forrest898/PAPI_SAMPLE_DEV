@@ -16,11 +16,12 @@
 #include <asm/unistd.h>
 #include <sys/prctl.h>
 #include <err.h>
-#include <perfmon/pfmlib.h>
 #include <inttypes.h>
 #include "PAPI_sample.h"
 #include "instructions_testcode.h"
-#include "perf_event.h"
+#include <perfmon/pfmlib.h>
+#include <perfmon/perf_event.h>
+#include <perfmon/pfmlib_perf_event.h>
 #include "perf_helpers.h"
 #include <papi.h>
 #include "matrix_multiply.h"
@@ -35,11 +36,11 @@ int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
 int main(int argc, char** argv) {
 
 	int ret, conv, i;
-	int *ev;
+	char *ev;
 	char *filename2 = "wowie";
 	// /FILE *fp;
 
-	if(argc != 2) {
+	if(argc != 3) {
 		printf("Please pass the req'd args\n");
 		exit(1);
 	}
@@ -63,13 +64,14 @@ int main(int argc, char** argv) {
 
 	//convert argument to integer because the sampling events are defined
 	// as 1-50 for right now
-	conv = atoi(argv[1]);
-	printf("%d\n", conv);
+	//conv = atoi(argv[1]);
+	//printf("%s\n", argv[2]);
 
-	ev = (int *)malloc(sizeof(int)*1);
+	ev = argv[2];
+	printf("%s\n", ev);
 
 	//set the sampling event
-	*ev = conv;
+	//*ev = conv;
 	//ev[1] = 36;
 
 	// initialize sampling
@@ -79,7 +81,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	//ret = PAPI_sample_start(1);
+	ret = PAPI_sample_start(1);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
@@ -91,13 +93,13 @@ int main(int argc, char** argv) {
 
 	//printf("Yo yo yo \n");
 
-//	ret = PAPI_sample_stop(1, 1);
+	ret = PAPI_sample_stop(1, 1);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
 	}
 
-	free(ev);
+	//free(ev);
 	return 0;
 
 }
