@@ -203,9 +203,10 @@ int PAPI_sample_start(int Eventset) {
 
 }
 
-int PAPI_sample_stop(int Eventset, int NumEvents) {
+int PAPI_sample_stop(int Eventset, int NumEvents, char* ev_name) {
 
     int ret, i;
+	long long count;
 	/*
 	int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
 			PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
@@ -223,7 +224,12 @@ int PAPI_sample_stop(int Eventset, int NumEvents) {
 	*/
  	ret=ioctl(fds[0], PERF_EVENT_IOC_DISABLE, 0);
 
+	printf("%s FAKE count value: \t%lld\n", ev_name, count);
 
+
+	read(fds[0], &count, sizeof(long long));
+
+	printf("%s count value: \t%lld\n", ev_name, count);
 
 	for(i=(NumEvents-1); i >= 0; i--) {
 		printf("Closing fds[%d]\n", i);
@@ -265,16 +271,16 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 
 	if(firstEvent) {
 
-        attr.sample_period=sample_period;
-		attr.sample_type=sample_type;
-		attr.read_format=read_format;
+        //attr.sample_period=sample_period;
+		//attr.sample_type=sample_type;
+		//attr.read_format=read_format;
 	    attr.disabled=1;
-		attr.wakeup_events=1;
+		//attr.wakeup_events=1;
 	    attr.pinned=1;
     }
 	else {
-		attr.sample_type=PERF_SAMPLE_RAW;
-		attr.read_format=PERF_FORMAT_GROUP|PERF_FORMAT_ID;
+		//attr.sample_type=PERF_SAMPLE_RAW;
+		//attr.read_format=PERF_FORMAT_GROUP|PERF_FORMAT_ID;
 	    attr.disabled=0;
 	}
 
@@ -300,16 +306,16 @@ struct perf_event_attr setup_perf(int EventCode, int sample_type,
 
     if(firstEvent) {
 
-        pe.sample_period=sample_period;
-		pe.sample_type=sample_type;
-		pe.read_format=read_format;
+       // pe.sample_period=sample_period;
+		//pe.sample_type=sample_type;
+		//pe.read_format=read_format;
 	    pe.disabled=1;
-		pe.wakeup_events=1;
+		//pe.wakeup_events=1;
 	    pe.pinned=1;
     }
 	else {
-		pe.sample_type=PERF_SAMPLE_RAW;
-		pe.read_format=PERF_FORMAT_GROUP|PERF_FORMAT_ID;
+		//pe.sample_type=PERF_SAMPLE_RAW;
+		//pe.read_format=PERF_FORMAT_GROUP|PERF_FORMAT_ID;
 	    pe.disabled=0;
 	}
 
