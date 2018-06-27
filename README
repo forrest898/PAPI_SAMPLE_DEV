@@ -6,4 +6,8 @@ t460p with ubuntu 16.04 LTS
 
 6/25
 about to completely reorganize the directory and add a decent makefile system (maybe....) 
-here goes nothing... 
+here goes nothing...
+
+6/27
+As of right now it appears sampling only works for 19 of the specified 50 events that PEBS is supposed to be supported for. It's unclear whether I'm using the perf_event_open interface wrong or if these events just dont work.
+ 
