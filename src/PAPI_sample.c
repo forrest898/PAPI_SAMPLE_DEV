@@ -19,10 +19,9 @@
 #include <papi.h>
 #include <perfmon/pfmlib.h>
 #include <perfmon/perf_event.h>
-#include <perfmon/pfmlib_perf_event.h>//#include "perf_event.h"
+#include <perfmon/pfmlib_perf_event.h>
 #include "test_utils.h"
 #include "perf_helpers.h"
-//#include "instructions_testcode.h"
 
 #include "parse_record.h"
 #include "PAPI_sample.h"
@@ -50,16 +49,19 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
         PERF_FORMAT_ID |
         PERF_FORMAT_TOTAL_TIME_ENABLED |
         PERF_FORMAT_TOTAL_TIME_RUNNING;
-
-	ret=ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
-
 	int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
 			PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
 			PERF_SAMPLE_ID | PERF_SAMPLE_CPU | PERF_SAMPLE_PERIOD |
 			PERF_SAMPLE_STREAM_ID | PERF_SAMPLE_RAW |
 			PERF_SAMPLE_DATA_SRC;
 
+	/* Disable counters in order to perform MMAP read */
+	ret=ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
 
+
+
+
+	/* Parse MMAP and read out our sampled values*/
 	prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
 		sample_type,read_format,
 		0, /* reg_mask */
@@ -68,9 +70,8 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 		NULL, /* events read */
 		RAW_NONE,
 		output_file);
-//    printf("I got interrupted\n");
-	//count_total++;
 
+	/* Re-enable counters */
 	ret=ioctl(fd, PERF_EVENT_IOC_REFRESH, 1);
 
 	(void) ret;
@@ -89,13 +90,14 @@ int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
     struct sigaction sa;
     char test_string[]="Testing Intel PEBS support...";
 
+	/* Open and clear contents of file to record the sampling results */
 	FILE* fp = fopen(filename, "w");
 	fclose(fp);
 
-	//set the filename that parse_record will write results to
+	/* Set global variable to be used by our signal handler */
 	output_file = filename;
 
-     //quiet=test_quiet();
+	/* Allocate as many file descriptors as events sampled */
     fds = (int *)malloc(sizeof(int)*NumEvents);
 
 	ret = pfm_initialize();
@@ -105,8 +107,8 @@ int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 
     firstEvent = 1;
 
-    //if(!quiet) printf("This begins the implementation of complex sampling with PAPI.\n");
-
+	/* Set up PAPI_sample_handler to catch the interrupt created when a counter
+		hits the user specified value */
     memset(&sa, 0, sizeof(struct sigaction));
     sa.sa_sigaction = PAPI_sample_handler;
     sa.sa_flags = SA_SIGINFO;
@@ -116,7 +118,8 @@ int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
         exit(1);
     }
 
-
+	/*	Setup perf_event_attr structures for each event and then
+		open a file descriptor for each */
     for(i = 0; i < NumEvents; i++) {
 
 		//TODO: before each event is processed into a pref_event_attr structure
@@ -126,7 +129,11 @@ int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 		memset(&pe,0,sizeof(struct perf_event_attr));
        //pe = setup_perf(EventCodes[i], sample_type, sample_period, firstEvent);
 		pe = new_setup_perf(EventCodes, sample_type, sample_period, firstEvent);
-        if(firstEvent) {
+
+		/* 	For the first event the fourth arg to perf_event_open is -1
+			For subsequent events, the group_fd (first evend's fd) is used
+			for the fourth argument to link the events together */
+		if(firstEvent) {
 
 			if(DEBUG) {
 				printf("Value of i is %d\n \
@@ -161,6 +168,8 @@ int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 
         }
 
+		/* 	Ensure only the first event uses -1 for the fourth arg to
+			perf_event_open */
         if(i == 0)
             firstEvent = 0;
     }
@@ -181,9 +190,9 @@ int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 
 }
 
+/* Function to call the ioctl's which will start the sampling process */
 int PAPI_sample_start(int Eventset) {
 
-    /* check to see if eventset is not null and valid first */
     int ret;
 
     if(fds[0] != NULL) {
@@ -208,44 +217,34 @@ int PAPI_sample_start(int Eventset) {
 
 }
 
+/* Function to call the ioctl's to stop sampling and perform memory cleanup */
 int PAPI_sample_stop(int Eventset, int NumEvents) {
 
     int ret, i, count;
-	/*
-	int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
-			PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
-			PERF_SAMPLE_ID | PERF_SAMPLE_CPU | PERF_SAMPLE_PERIOD |
-			PERF_SAMPLE_STREAM_ID | PERF_SAMPLE_RAW |
-			PERF_SAMPLE_DATA_SRC;
-	*/
-    ret=ioctl(fds[0], PERF_EVENT_IOC_REFRESH,0);
+
+	ret=ioctl(fds[0], PERF_EVENT_IOC_REFRESH,0);
     printf("File ready for parsing\n");
-	/*
- 	int read_format = PERF_FORMAT_GROUP |
-	 	PERF_FORMAT_ID |
-	 	PERF_FORMAT_TOTAL_TIME_ENABLED |
-	 	PERF_FORMAT_TOTAL_TIME_RUNNING;
-	*/
+
  	ret=ioctl(fds[0], PERF_EVENT_IOC_DISABLE, 0);
 
-	read(fds[0], &count, sizeof(long long));
-
-	printf("Count of conuts: %lld", count);
-
-
+	/* Close the perf_event_open fd's */
 	for(i=(NumEvents-1); i >= 0; i--) {
 		printf("Closing fds[%d]\n", i);
 		close(fds[i]);
 	}
 
+	/* Unmap the MMAP */
 	munmap(our_mmap, 1+MMAP_DATA_SIZE*getpagesize());
 
+	/* Free perf_event_open FD's */
 	free(fds);
 
     return PAPI_OK;
 
 }
 
+/*	Function which returns a perf_event_attr that is generated via a call
+	to libpfm */
 struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
                                     int sample_period, int firstEvent)  {
 
@@ -262,8 +261,11 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 	memset(&attr, 0, sizeof(attr));
 
  	raw.size = sizeof(raw);
+	/* 	If raw.attr is not defined pfm_get_os_event_encoding will throw an
+		error */
  	raw.attr = &attr;
 
+	/* Sets up the perf_event_attr */
     ret = pfm_get_os_event_encoding(EventCode, PFM_PLM3, PFM_OS_PERF_EVENT, &raw);
 
 	if (ret != PFM_SUCCESS) {
@@ -271,8 +273,9 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 		exit(1);
 	}
 
+	/* 	Make sure to set the proper sampling paramters for the first event to
+		ensure interrupts will be generated on the sample_period */
 	if(firstEvent) {
-
         attr.sample_period=sample_period;
 		attr.sample_type=sample_type;
 		attr.read_format=read_format;
@@ -281,6 +284,8 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 	    attr.pinned=0;
 		attr.precise_ip=0;
     }
+	/* 	Setting disabled=0 for subsequent events will *NOT* cause them to start
+ 		counting until the group fd has started counting */
 	else {
 		attr.sample_type=PERF_SAMPLE_RAW;
 		attr.read_format=PERF_FORMAT_GROUP|PERF_FORMAT_ID;
@@ -289,10 +294,10 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 
 	return attr;
 
-
-
 }
 
+/* 	Old funcition to generate perf_event_attr setup. Hard coded with Skylake
+	events and #defines found in PAPI_sample.h */
 struct perf_event_attr setup_perf(int EventCode, int sample_type,
                                     int sample_period, int firstEvent) {
 

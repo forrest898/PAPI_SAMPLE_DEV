@@ -38,6 +38,7 @@ int main(int argc, char** argv) {
 	int ret, conv, i;
 	char *ev;
 	char *filename2 = "wowie";
+	PAPI_hw_info_t* hwinfo;
 	// /FILE *fp;
 
 	if(argc != 3) {
@@ -66,6 +67,17 @@ int main(int argc, char** argv) {
 	// as 1-50 for right now
 	//conv = atoi(argv[1]);
 	//printf("%s\n", argv[2]);
+	PAPI_library_init(PAPI_VER_CURRENT);
+ /*
+const PAPI_hw_info_t *
+PAPI_get_hardware_info( void )
+	printf("%s\n", PAPI_hw_info_t.model_string);
+
+*/
+	papi_events_table[1];
+	argv[1];
+	hwinfo = PAPI_get_hardware_info();
+	printf("0x%x\n", hwinfo->cpuid_model);
 
 	ev = argv[2];
 	printf("%s\n", ev);
