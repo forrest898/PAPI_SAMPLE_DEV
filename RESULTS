@@ -1,0 +1,50 @@
+BR_INST_RETIRED.ALL_BRANCHES count value: 	406601207
+BR_INST_RETIRED.CONDITIONAL count value: 	405808148
+BR_INST_RETIRED.FAR_BRANCH count value: 	2000
+BR_INST_RETIRED.NEAR_CALL count value: 	6
+BR_INST_RETIRED.NEAR_RETURN count value: 	6
+BR_INST_RETIRED.NEAR_TAKEN count value: 	405808161
+BR_MISP_RETIRED.ALL_BRANCHES count value: 	792728
+BR_MISP_RETIRED.CONDITIONAL count value: 	793285
+BR_MISP_RETIRED.NEAR_CALL count value: 	0
+BR_MISP_RETIRED.NEAR_TAKEN count value: 	2166
+FRONTEND_RETIRED.DSB_MISS count value: 	279413
+FRONTEND_RETIRED.ITLB_MISS count value: 	2861
+FRONTEND_RETIRED.STLB_MISS count value: 	113
+FRONTEND_RETIRED.L1I_MISS count value: 	1942
+FRONTEND_RETIRED.L2_MISS count value: 	1126
+gen_codes can't get encoding invalid event attribute
+gen_codes can't get encoding invalid event attribute
+gen_codes can't get encoding invalid event attribute
+gen_codes can't get encoding invalid event attribute
+gen_codes can't get encoding invalid event attribute
+gen_codes can't get encoding invalid event attribute
+gen_codes can't get encoding invalid event attribute
+gen_codes can't get encoding invalid event attribute
+gen_codes can't get encoding invalid event attribute
+gen_codes can't get encoding invalid event attribute
+gen_codes can't get encoding invalid event attribute
+gen_codes can't get encoding invalid event attribute
+MEM_INST_RETIRED.STLB_MISS_LOADS count value: 	5527
+MEM_INST_RETIRED.STLB_MISS_STORES count value: 	470336
+MEM_INST_RETIRED.LOCK_LOADS count value: 	0
+MEM_INST_RETIRED.SPLIT_LOADS count value: 	0
+MEM_INST_RETIRED.SPLIT_STORES count value: 	0
+MEM_INST_RETIRED.ALL_LOADS count value: 	3641028553
+MEM_INST_RETIRED.ALL_STORES count value: 	812393509
+HLE_RETIRED.ABORTED count value: 	0
+INST_RETIRED.TOTAL_CYCLES count value: 	4903748035
+MEM_LOAD_L3_HIT_RETIRED.XSNP_HIT count value: 	0
+MEM_LOAD_L3_HIT_RETIRED.XSNP_HITM count value: 	0
+MEM_LOAD_L3_HIT_RETIRED.XSNP_MISS count value: 	0
+MEM_LOAD_L3_HIT_RETIRED.XSNP_NONE count value: 	395049285
+MEM_LOAD_MISC_RETIRED.UC count value: 	0
+MEM_LOAD_RETIRED.FB_HIT count value: 	10674593
+MEM_LOAD_RETIRED.L1_HIT count value: 	3233117645
+MEM_LOAD_RETIRED.L1_MISS count value: 	397744633
+MEM_LOAD_RETIRED.L2_HIT count value: 	749097
+MEM_LOAD_RETIRED.L2_MISS count value: 	396474726
+MEM_LOAD_RETIRED.L3_HIT count value: 	394963712
+MEM_LOAD_RETIRED.L3_MISS count value: 	1580108
+RTM_RETIRED.ABORTED count value: 	0
+Please pass the req'd args

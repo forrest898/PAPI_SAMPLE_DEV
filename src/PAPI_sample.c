@@ -215,7 +215,7 @@ int PAPI_sample_stop(int Eventset, int NumEvents, char* ev_name) {
 			PERF_SAMPLE_DATA_SRC;
 	*/
     ret=ioctl(fds[0], PERF_EVENT_IOC_REFRESH,0);
-    printf("File ready for parsing\n");
+    //printf("File ready for parsing\n");
 	/*
  	int read_format = PERF_FORMAT_GROUP |
 	 	PERF_FORMAT_ID |
@@ -224,7 +224,7 @@ int PAPI_sample_stop(int Eventset, int NumEvents, char* ev_name) {
 	*/
  	ret=ioctl(fds[0], PERF_EVENT_IOC_DISABLE, 0);
 
-	printf("%s FAKE count value: \t%lld\n", ev_name, count);
+	// /printf("%s FAKE count value: \t%lld\n", ev_name, count);
 
 
 	read(fds[0], &count, sizeof(long long));
@@ -232,7 +232,7 @@ int PAPI_sample_stop(int Eventset, int NumEvents, char* ev_name) {
 	printf("%s count value: \t%lld\n", ev_name, count);
 
 	for(i=(NumEvents-1); i >= 0; i--) {
-		printf("Closing fds[%d]\n", i);
+		// /printf("Closing fds[%d]\n", i);
 		close(fds[i]);
 	}
 

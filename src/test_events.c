@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
 	//printf("%s\n", argv[2]);
 
 	ev = argv[2];
-	printf("%s\n", ev);
+	//printf("%s\n", ev);
 
 	//set the sampling event
 	//*ev = conv;
@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
 	}
 
 	for(i = 0; i < 3; i++) {
-		naive_matrix_multiply(0);
+		naive_matrix_multiply(1);
 	}
 
 	//printf("Yo yo yo \n");
