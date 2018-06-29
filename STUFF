@@ -1,0 +1,321 @@
+BR_INST_RETIRED.ALL_BRANCHES
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+BR_INST_RETIRED.ALL_BRANCHES FAKE count value: 	512
+BR_INST_RETIRED.ALL_BRANCHES count value: 	406602924
+Closing fds[0]
+BR_INST_RETIRED.CONDITIONAL
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+BR_INST_RETIRED.CONDITIONAL FAKE count value: 	512
+BR_INST_RETIRED.CONDITIONAL count value: 	405810208
+Closing fds[0]
+BR_INST_RETIRED.FAR_BRANCH
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+BR_INST_RETIRED.FAR_BRANCH FAKE count value: 	512
+BR_INST_RETIRED.FAR_BRANCH count value: 	788
+Closing fds[0]
+BR_INST_RETIRED.NEAR_CALL
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+BR_INST_RETIRED.NEAR_CALL FAKE count value: 	512
+BR_INST_RETIRED.NEAR_CALL count value: 	307
+Closing fds[0]
+BR_INST_RETIRED.NEAR_RETURN
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+BR_INST_RETIRED.NEAR_RETURN FAKE count value: 	512
+BR_INST_RETIRED.NEAR_RETURN count value: 	307
+Closing fds[0]
+BR_INST_RETIRED.NEAR_TAKEN
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+BR_INST_RETIRED.NEAR_TAKEN FAKE count value: 	512
+BR_INST_RETIRED.NEAR_TAKEN count value: 	405809773
+Closing fds[0]
+BR_MISP_RETIRED.ALL_BRANCHES
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+BR_MISP_RETIRED.ALL_BRANCHES FAKE count value: 	512
+BR_MISP_RETIRED.ALL_BRANCHES count value: 	791266
+Closing fds[0]
+BR_MISP_RETIRED.CONDITIONAL
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+BR_MISP_RETIRED.CONDITIONAL FAKE count value: 	512
+BR_MISP_RETIRED.CONDITIONAL count value: 	791343
+Closing fds[0]
+BR_MISP_RETIRED.NEAR_CALL
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+BR_MISP_RETIRED.NEAR_CALL FAKE count value: 	512
+BR_MISP_RETIRED.NEAR_CALL count value: 	5
+Closing fds[0]
+BR_MISP_RETIRED.NEAR_TAKEN
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+BR_MISP_RETIRED.NEAR_TAKEN FAKE count value: 	512
+BR_MISP_RETIRED.NEAR_TAKEN count value: 	223
+Closing fds[0]
+FRONTEND_RETIRED.DSB_MISS
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+FRONTEND_RETIRED.DSB_MISS FAKE count value: 	512
+FRONTEND_RETIRED.DSB_MISS count value: 	22935
+Closing fds[0]
+FRONTEND_RETIRED.ITLB_MISS
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+FRONTEND_RETIRED.ITLB_MISS FAKE count value: 	512
+FRONTEND_RETIRED.ITLB_MISS count value: 	50
+Closing fds[0]
+FRONTEND_RETIRED.STLB_MISS
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+FRONTEND_RETIRED.STLB_MISS FAKE count value: 	512
+FRONTEND_RETIRED.STLB_MISS count value: 	9
+Closing fds[0]
+FRONTEND_RETIRED.L1I_MISS
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+FRONTEND_RETIRED.L1I_MISS FAKE count value: 	512
+FRONTEND_RETIRED.L1I_MISS count value: 	225
+Closing fds[0]
+FRONTEND_RETIRED.L2_MISS
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+FRONTEND_RETIRED.L2_MISS FAKE count value: 	512
+FRONTEND_RETIRED.L2_MISS count value: 	162
+Closing fds[0]
+FRONTEND_RETIRED.LATENCY_GE_128
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED.LATENCY_GE_16
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED.LATENCY_GE_2_BUBBLES_GE_1
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED.LATENCY_GE_2_BUBBLES_GE_2
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED.LATENCY_GE_2_BUBBLES_GE_3
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED.LATENCY_GE_2
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED.LATENCY_GE_256
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED.LATENCY_GE_32
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED.LATENCY_GE_4
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED.LATENCY_GE_512
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED.LATENCY_GE_64
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED.LATENCY_GE_8
+gen_codes can't get encoding invalid event attribute
+MEM_INST_RETIRED.STLB_MISS_LOADS
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_INST_RETIRED.STLB_MISS_LOADS FAKE count value: 	512
+MEM_INST_RETIRED.STLB_MISS_LOADS count value: 	9
+Closing fds[0]
+MEM_INST_RETIRED.STLB_MISS_STORES
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_INST_RETIRED.STLB_MISS_STORES FAKE count value: 	512
+MEM_INST_RETIRED.STLB_MISS_STORES count value: 	519
+Closing fds[0]
+MEM_INST_RETIRED.LOCK_LOADS
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_INST_RETIRED.LOCK_LOADS FAKE count value: 	512
+MEM_INST_RETIRED.LOCK_LOADS count value: 	0
+Closing fds[0]
+MEM_INST_RETIRED.SPLIT_LOADS
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_INST_RETIRED.SPLIT_LOADS FAKE count value: 	512
+MEM_INST_RETIRED.SPLIT_LOADS count value: 	5
+Closing fds[0]
+MEM_INST_RETIRED.SPLIT_STORES
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_INST_RETIRED.SPLIT_STORES FAKE count value: 	512
+MEM_INST_RETIRED.SPLIT_STORES count value: 	6
+Closing fds[0]
+MEM_INST_RETIRED.ALL_LOADS
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_INST_RETIRED.ALL_LOADS FAKE count value: 	512
+MEM_INST_RETIRED.ALL_LOADS count value: 	3641196846
+Closing fds[0]
+MEM_INST_RETIRED.ALL_STORES
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_INST_RETIRED.ALL_STORES FAKE count value: 	512
+MEM_INST_RETIRED.ALL_STORES count value: 	812395780
+Closing fds[0]
+HLE_RETIRED.ABORTED
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+HLE_RETIRED.ABORTED FAKE count value: 	512
+HLE_RETIRED.ABORTED count value: 	0
+Closing fds[0]
+INST_RETIRED.TOTAL_CYCLES
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+INST_RETIRED.TOTAL_CYCLES FAKE count value: 	512
+INST_RETIRED.TOTAL_CYCLES count value: 	4908493773
+Closing fds[0]
+MEM_LOAD_L3_HIT_RETIRED.XSNP_HIT
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_LOAD_L3_HIT_RETIRED.XSNP_HIT FAKE count value: 	512
+MEM_LOAD_L3_HIT_RETIRED.XSNP_HIT count value: 	0
+Closing fds[0]
+MEM_LOAD_L3_HIT_RETIRED.XSNP_HITM
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_LOAD_L3_HIT_RETIRED.XSNP_HITM FAKE count value: 	512
+MEM_LOAD_L3_HIT_RETIRED.XSNP_HITM count value: 	0
+Closing fds[0]
+MEM_LOAD_L3_HIT_RETIRED.XSNP_MISS
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_LOAD_L3_HIT_RETIRED.XSNP_MISS FAKE count value: 	512
+MEM_LOAD_L3_HIT_RETIRED.XSNP_MISS count value: 	0
+Closing fds[0]
+MEM_LOAD_L3_HIT_RETIRED.XSNP_NONE
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_LOAD_L3_HIT_RETIRED.XSNP_NONE FAKE count value: 	512
+MEM_LOAD_L3_HIT_RETIRED.XSNP_NONE count value: 	398048675
+Closing fds[0]
+MEM_LOAD_MISC_RETIRED.UC
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_LOAD_MISC_RETIRED.UC FAKE count value: 	512
+MEM_LOAD_MISC_RETIRED.UC count value: 	0
+Closing fds[0]
+MEM_LOAD_RETIRED.FB_HIT
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_LOAD_RETIRED.FB_HIT FAKE count value: 	512
+MEM_LOAD_RETIRED.FB_HIT count value: 	5262510
+Closing fds[0]
+MEM_LOAD_RETIRED.L1_HIT
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_LOAD_RETIRED.L1_HIT FAKE count value: 	512
+MEM_LOAD_RETIRED.L1_HIT count value: 	3236178996
+Closing fds[0]
+MEM_LOAD_RETIRED.L1_MISS
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_LOAD_RETIRED.L1_MISS FAKE count value: 	512
+MEM_LOAD_RETIRED.L1_MISS count value: 	399708496
+Closing fds[0]
+MEM_LOAD_RETIRED.L2_HIT
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_LOAD_RETIRED.L2_HIT FAKE count value: 	512
+MEM_LOAD_RETIRED.L2_HIT count value: 	1491269
+Closing fds[0]
+MEM_LOAD_RETIRED.L2_MISS
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_LOAD_RETIRED.L2_MISS FAKE count value: 	512
+MEM_LOAD_RETIRED.L2_MISS count value: 	398110475
+Closing fds[0]
+MEM_LOAD_RETIRED.L3_HIT
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_LOAD_RETIRED.L3_HIT FAKE count value: 	512
+MEM_LOAD_RETIRED.L3_HIT count value: 	396655104
+Closing fds[0]
+MEM_LOAD_RETIRED.L3_MISS
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+MEM_LOAD_RETIRED.L3_MISS FAKE count value: 	512
+MEM_LOAD_RETIRED.L3_MISS count value: 	21759
+Closing fds[0]
+RTM_RETIRED.ABORTED
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+Matrix multiply sum: s=27665734022509.746094
+File ready for parsing
+RTM_RETIRED.ABORTED FAKE count value: 	512
+RTM_RETIRED.ABORTED count value: 	0
+Closing fds[0]
+Please pass the req'd args
