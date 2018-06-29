@@ -116,9 +116,14 @@ int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
         exit(1);
     }
 
+
     for(i = 0; i < NumEvents; i++) {
 
-        memset(&pe,0,sizeof(struct perf_event_attr));
+		//TODO: before each event is processed into a pref_event_attr structure
+		// the PAPI version of the event must be translate to the string
+		// for the corresponding architecture in order to call libpfm4
+
+		memset(&pe,0,sizeof(struct perf_event_attr));
        //pe = setup_perf(EventCodes[i], sample_type, sample_period, firstEvent);
 		pe = new_setup_perf(EventCodes, sample_type, sample_period, firstEvent);
         if(firstEvent) {
