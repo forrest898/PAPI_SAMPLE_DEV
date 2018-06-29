@@ -74,8 +74,18 @@ PAPI_get_hardware_info( void )
 	printf("%s\n", PAPI_hw_info_t.model_string);
 
 */
-	papi_events_table[1];
-	argv[1];
+	//papi_events_table[1];
+	//argv[1]
+
+	/* 	TODO:
+		Use the hardware info and the INTEL manual to sort processor by
+		architecture. Then set up a translator from a PAPI standard defined
+		event to the INTEL name so that libpfm4 can be used as it is in
+		PAPI_sample.
+
+		After that, need to work out a way to get all 50 PEBS events recording
+		samples for Skylake	(and then other arch's)
+	*/
 	hwinfo = PAPI_get_hardware_info();
 	printf("0x%x\n", hwinfo->cpuid_model);
 
