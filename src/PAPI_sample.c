@@ -1,3 +1,22 @@
+/*	This file represents my first attempts to develop a sampling interface for
+ *	the PAPI library. It uses code largely written by Vincent Weaver (files like
+ *	parse_record, test_utils, perf_helpers, and much of this file). The
+ *	sampling interface takes advantage of the libpfm4 library; PAPI events are
+ * 	translated to their corresponding Intel events. libpfm4 is then used to
+ * 	set up perf_event_attr's for selected events. Sampling type and frequency
+ *	are specified by the user as well as the filename to store the sampling
+ *  results.
+
+
+
+	TODO:If no filename is given, then the results are stored in the default
+	file data.perf. If this file already exists, an error code will be returned.
+
+
+ */
+
+
+
 #define _GNU_SOURCE 1
 
 #include <stdio.h>

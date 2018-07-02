@@ -86,6 +86,10 @@ PAPI_get_hardware_info( void )
 		After that, need to work out a way to get all 50 PEBS events recording
 		samples for Skylake	(and then other arch's)
 	*/
+
+	printf("0x%x\n", PAPI_L3_LDM);
+
+
 	hwinfo = PAPI_get_hardware_info();
 	printf("0x%x\n", hwinfo->cpuid_model);
 
