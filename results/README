@@ -1,0 +1,5 @@
+This directory contains the testing results for the sampling interface as events
+are added and as support gradually extends to more events for each architecture.
+
+Right now, the results are just a general "yes/no" as to whether I could get
+reasonable counting results for each event on an architecture.
