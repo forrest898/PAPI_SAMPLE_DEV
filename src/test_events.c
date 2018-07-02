@@ -87,11 +87,11 @@ PAPI_get_hardware_info( void )
 		samples for Skylake	(and then other arch's)
 	*/
 
-	printf("0x%x\n", PAPI_L3_LDM);
+	//printf("0x%x\n", PAPI_L3_LDM);
 
 
-	hwinfo = PAPI_get_hardware_info();
-	printf("0x%x\n", hwinfo->cpuid_model);
+	//hwinfo = PAPI_get_hardware_info();
+	//printf("0x%x\n", hwinfo->cpuid_model);
 
 	ev = argv[2];
 	printf("%s\n", ev);
