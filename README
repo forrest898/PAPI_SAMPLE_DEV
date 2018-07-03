@@ -1,5 +1,13 @@
 This repository represents the first attempt to develop sampling with PAPI.
 
+Usage:
+Calling the script "test_script" like so:
+	./test_script ./src/event_lists/LISTOFEVENTSFORYOURARCHITECTURE
+will try to sample every event available for the architecture at a frequency
+specified in the file src/test_events.c
+
+History:
+
 6/22
 about half of the events for the Skylake processor series are working with an i7-6820HQ on a lenovo
 t460p with ubuntu 16.04 LTS
@@ -18,3 +26,13 @@ feeds them into libpfm in order to generate perf_event_attr structures, which
 are modified slightly before use. As it progresses, the code should take generic
 PAPI sampling names; these can then be used to translate to the INTEL name,
 which can be fed to the call to pfm_get_os_event_encoding.
+
+7/3
+Verified that about 15 more events are *working* at least for SKYLAKE. The
+sampling frequency had previously been set to a value that was too large to
+catch sampling results for these events because the events do not trigger as
+frequently as common ones.
+
+Currently working to develop a test program for the HLE and RTM metrics. These
+features correspond to specific assembly instructions, and therefore need a
+separate test.
