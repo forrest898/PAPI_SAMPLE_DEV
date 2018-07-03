@@ -1,4 +1,5 @@
 #!/bin/bash
+make clean && make 
 counter=0
 filename="$1"
 while read -r line
