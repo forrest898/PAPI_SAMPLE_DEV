@@ -1,0 +1,62 @@
+BR_INST_RETIRED:FAR_BRANCH
+Event count: 1993
+BR_INST_RETIRED:NEAR_CALL
+Event count: 10
+BR_INST_RETIRED:NEAR_RETURN
+Event count: 10
+BR_MISP_RETIRED:NEAR_CALL
+Event count: 1
+BR_MISP_RETIRED:NEAR_TAKEN
+Event count: 436
+FRONTEND_RETIRED:ITLB_MISS
+Event count: 870
+FRONTEND_RETIRED:STLB_MISS
+Event count: 49
+FRONTEND_RETIRED:L1I_MISS
+Event count: 525
+FRONTEND_RETIRED:L2_MISS
+Event count: 905
+FRONTEND_RETIRED:LATENCY_GE_128
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED:LATENCY_GE_16
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED:LATENCY_GE_2_BUBBLES_GE_1
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED:LATENCY_GE_2_BUBBLES_GE_2
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED:LATENCY_GE_2_BUBBLES_GE_3
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED:LATENCY_GE_2
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED:LATENCY_GE_256
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED:LATENCY_GE_32
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED:LATENCY_GE_4
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED:LATENCY_GE_512
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED:LATENCY_GE_64
+gen_codes can't get encoding invalid event attribute
+FRONTEND_RETIRED:LATENCY_GE_8
+gen_codes can't get encoding invalid event attribute
+MEM_INST_RETIRED:STLB_MISS_LOADS
+Event count: 26511
+MEM_INST_RETIRED:LOCK_LOADS
+Event count: 0
+MEM_INST_RETIRED:SPLIT_LOADS
+Event count: 0
+MEM_INST_RETIRED:SPLIT_STORES
+Event count: 0
+HLE_RETIRED:ABORTED
+Event count: 0
+MEM_LOAD_L3_HIT_RETIRED:XSNP_HIT
+Event count: 0
+MEM_LOAD_L3_HIT_RETIRED:XSNP_HITM
+Event count: 0
+MEM_LOAD_L3_HIT_RETIRED:XSNP_MISS
+Event count: 0
+MEM_LOAD_MISC_RETIRED:UC
+Event count: 0
+RTM_RETIRED:ABORTED
+Event count: 0

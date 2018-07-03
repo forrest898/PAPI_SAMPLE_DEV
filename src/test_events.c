@@ -110,8 +110,8 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	for(i = 0; i < 3; i++) {
-		naive_matrix_multiply(0);
+	for(i = 0; i < 5; i++) {
+		naive_matrix_multiply(1);
 	}
 
 	ret = PAPI_sample_stop(1, 1);

@@ -1,0 +1,57 @@
+BR_INST_RETIRED:FAR_BRANCH
+File ready for parsing
+Event count: 2531
+BR_INST_RETIRED:NEAR_CALL
+File ready for parsing
+Event count: 12
+BR_INST_RETIRED:NEAR_RETURN
+File ready for parsing
+Event count: 12
+BR_MISP_RETIRED:NEAR_CALL
+File ready for parsing
+Event count: 1
+BR_MISP_RETIRED:NEAR_TAKEN
+File ready for parsing
+Event count: 748
+FRONTEND_RETIRED:ITLB_MISS
+File ready for parsing
+Event count: 467
+FRONTEND_RETIRED:STLB_MISS
+File ready for parsing
+Event count: 69
+FRONTEND_RETIRED:L1I_MISS
+File ready for parsing
+Event count: 3965
+FRONTEND_RETIRED:L2_MISS
+File ready for parsing
+Event count: 4681
+MEM_INST_RETIRED:STLB_MISS_LOADS
+File ready for parsing
+Event count: 6167
+MEM_INST_RETIRED:LOCK_LOADS
+File ready for parsing
+Event count: 0
+MEM_INST_RETIRED:SPLIT_LOADS
+File ready for parsing
+Event count: 0
+MEM_INST_RETIRED:SPLIT_STORES
+File ready for parsing
+Event count: 0
+HLE_RETIRED:ABORTED
+File ready for parsing
+Event count: 0
+MEM_LOAD_L3_HIT_RETIRED:XSNP_HIT
+File ready for parsing
+Event count: 0
+MEM_LOAD_L3_HIT_RETIRED:XSNP_HITM
+File ready for parsing
+Event count: 0
+MEM_LOAD_L3_HIT_RETIRED:XSNP_MISS
+File ready for parsing
+Event count: 0
+MEM_LOAD_MISC_RETIRED:UC
+File ready for parsing
+Event count: 0
+RTM_RETIRED:ABORTED
+File ready for parsing
+Event count: 0

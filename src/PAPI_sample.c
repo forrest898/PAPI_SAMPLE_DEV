@@ -48,7 +48,7 @@
 
 #define MMAP_DATA_SIZE 8
 #define DEBUG 0
-
+#define AGGREGATE 0
 //static int32_t init = 0;
 static int32_t quiet=0;
 static int* fds;
@@ -240,18 +240,20 @@ int PAPI_sample_start(int Eventset) {
 int PAPI_sample_stop(int Eventset, int NumEvents) {
 
     int ret, i, count;
-	//long long meow;
 
 	ret=ioctl(fds[0], PERF_EVENT_IOC_REFRESH,0);
     printf("File ready for parsing\n");
 
  	ret=ioctl(fds[0], PERF_EVENT_IOC_DISABLE, 0);
 
-	//read(fds[0], &meow, sizeof(long long));
-	//printf("Event count: %lld\n", meow);
+	if(AGGREGATE) {
+		long long meow;
+		read(fds[0], &meow, sizeof(long long));
+		printf("Event count: %lld\n", meow);
+	}
 	/* Close the perf_event_open fd's */
 	for(i=(NumEvents-1); i >= 0; i--) {
-		printf("Closing fds[%d]\n", i);
+		//printf("Closing fds[%d]\n", i);
 		close(fds[i]);
 	}
 
@@ -298,9 +300,12 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 	/* 	Make sure to set the proper sampling paramters for the first event to
 		ensure interrupts will be generated on the sample_period */
 	if(firstEvent) {
-        attr.sample_period=sample_period;
-		attr.sample_type=sample_type;
-		attr.read_format=read_format;
+		if(AGGREGATE);
+		else {
+        	attr.sample_period=sample_period;
+			attr.sample_type=sample_type;
+			attr.read_format=read_format;
+		}
 	    attr.disabled=1;
 		attr.wakeup_events=1;
 	    attr.pinned=1;
