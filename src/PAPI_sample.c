@@ -240,12 +240,15 @@ int PAPI_sample_start(int Eventset) {
 int PAPI_sample_stop(int Eventset, int NumEvents) {
 
     int ret, i, count;
+	//long long meow;
 
 	ret=ioctl(fds[0], PERF_EVENT_IOC_REFRESH,0);
     printf("File ready for parsing\n");
 
  	ret=ioctl(fds[0], PERF_EVENT_IOC_DISABLE, 0);
 
+	//read(fds[0], &meow, sizeof(long long));
+	//printf("Event count: %lld\n", meow);
 	/* Close the perf_event_open fd's */
 	for(i=(NumEvents-1); i >= 0; i--) {
 		printf("Closing fds[%d]\n", i);
@@ -300,16 +303,22 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 		attr.read_format=read_format;
 	    attr.disabled=1;
 		attr.wakeup_events=1;
-	    attr.pinned=0;
+	    attr.pinned=1;
 		attr.precise_ip=0;
     }
 	/* 	Setting disabled=0 for subsequent events will *NOT* cause them to start
  		counting until the group fd has started counting */
 	else {
+	    attr.pinned=1;
 		attr.sample_type=PERF_SAMPLE_RAW;
 		attr.read_format=PERF_FORMAT_GROUP|PERF_FORMAT_ID;
 	    attr.disabled=0;
 	}
+
+	if(sample_type & PERF_SAMPLE_BRANCH_STACK) {
+		attr.branch_sample_type=PERF_SAMPLE_BRANCH_ANY;
+	}
+
 
 	return attr;
 

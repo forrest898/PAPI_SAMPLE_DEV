@@ -30,7 +30,7 @@ int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
 		PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
 		PERF_SAMPLE_ID | PERF_SAMPLE_CPU | PERF_SAMPLE_PERIOD |
 		PERF_SAMPLE_STREAM_ID | PERF_SAMPLE_RAW |
-		PERF_SAMPLE_DATA_SRC;
+		PERF_SAMPLE_DATA_SRC ;
 
 
 int main(int argc, char** argv) {
@@ -38,6 +38,7 @@ int main(int argc, char** argv) {
 	int ret, conv, i;
 	char *ev;
 	char *filename2 = "wowie";
+	char *br = "BR_";
 	PAPI_hw_info_t* hwinfo;
 	// /FILE *fp;
 
@@ -63,19 +64,7 @@ int main(int argc, char** argv) {
     	filename[len + 2] = '\0';
 	}
 
-	//convert argument to integer because the sampling events are defined
-	// as 1-50 for right now
-	//conv = atoi(argv[1]);
-	//printf("%s\n", argv[2]);
 	PAPI_library_init(PAPI_VER_CURRENT);
- /*
-const PAPI_hw_info_t *
-PAPI_get_hardware_info( void )
-	printf("%s\n", PAPI_hw_info_t.model_string);
-
-*/
-	//papi_events_table[1];
-	//argv[1]
 
 	/* 	TODO:
 		Use the hardware info and the INTEL manual to sort processor by
@@ -85,6 +74,9 @@ PAPI_get_hardware_info( void )
 
 		After that, need to work out a way to get all 50 PEBS events recording
 		samples for Skylake	(and then other arch's)
+
+		consider replacing the use of PAPI_get_hardware_info with Vince's
+		processor detect function.
 	*/
 
 	//printf("0x%x\n", PAPI_L3_LDM);
@@ -96,12 +88,17 @@ PAPI_get_hardware_info( void )
 	ev = argv[2];
 	printf("%s\n", ev);
 
+	if(strstr(argv[2], br) != NULL) {
+		//printf("someone's looking fabulous\n");
+		sample_type |= PERF_SAMPLE_BRANCH_STACK;
+	}
+
 	//set the sampling event
 	//*ev = conv;
 	//ev[1] = 36;
 
 	// initialize sampling
-	ret = PAPI_sample_init(1, ev, 1, sample_type, 100000, filename);
+	ret = PAPI_sample_init(1, ev, 1, sample_type, 50, filename);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
@@ -117,15 +114,12 @@ PAPI_get_hardware_info( void )
 		naive_matrix_multiply(0);
 	}
 
-	//printf("Yo yo yo \n");
-
 	ret = PAPI_sample_stop(1, 1);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
 	}
 
-	//free(ev);
 	return 0;
 
 }

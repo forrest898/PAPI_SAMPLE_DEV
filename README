@@ -1,6 +1,6 @@
 This repository represents the first attempt to develop sampling with PAPI.
 
-As of 2:56pm,
+6/22
 about half of the events for the Skylake processor series are working with an i7-6820HQ on a lenovo
 t460p with ubuntu 16.04 LTS
 
@@ -17,4 +17,4 @@ As the code stands right now, it takes the INTEL name for sampling events and
 feeds them into libpfm in order to generate perf_event_attr structures, which
 are modified slightly before use. As it progresses, the code should take generic
 PAPI sampling names; these can then be used to translate to the INTEL name,
-which can be fed to the call to pfm_get_os_event_encoding. 
+which can be fed to the call to pfm_get_os_event_encoding.
