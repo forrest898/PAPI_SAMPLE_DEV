@@ -16,7 +16,6 @@
  */
 
 
-
 #define _GNU_SOURCE 1
 
 #include <stdio.h>
@@ -48,7 +47,7 @@
 
 #define MMAP_DATA_SIZE 8
 #define DEBUG 0
-#define AGGREGATE 0
+#define AGGREGATE 1
 //static int32_t init = 0;
 static int32_t quiet=0;
 static int* fds;
@@ -74,6 +73,7 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 			PERF_SAMPLE_STREAM_ID | PERF_SAMPLE_RAW |
 			PERF_SAMPLE_DATA_SRC;
 
+	//printf("Handler!\n");
 	/* Disable counters in order to perform MMAP read */
 	ret=ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
 

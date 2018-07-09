@@ -36,3 +36,9 @@ frequently as common ones.
 Currently working to develop a test program for the HLE and RTM metrics. These
 features correspond to specific assembly instructions, and therefore need a
 separate test.
+
+7/9
+Current sampling interface is safe only for serial programs (ie not multithreaded)
+After trying to sample some results on linpack, the code became trapped in an
+infinite loop. The PAPI_sampled events need to interface with the ESI system
+for eventsets in order to make them thread safe. 
