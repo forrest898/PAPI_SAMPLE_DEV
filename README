@@ -46,4 +46,18 @@ for eventsets in order to make them thread safe.
 7/10
 After closely examining "A Prototype Sampling Interface for PAPI", I found the
 solution to my multicore problem. About to switch the interface over to use
-multiple perf_event_open for each core so all events are monitored. 
+multiple perf_event_open for each core so all events are monitored.
+
+7/10 (cont.)
+Started the transition to multicore. Encountering some struggles:
+	Can each thread use the same event handler?
+		If so, how do I make sure that parse_record gets the MMAP associated
+		with the correct file descriptor/interrupt.
+			One solution is having a handler for every thread but this seems
+			very clunky
+			How to map file descriptor to MMAP
+
+	Should the MMAPs be managed outside or inside the sample_init?
+		I would think local modification makes sense to abstract complication
+		of mmap from user.
+		Back to issue number 1....

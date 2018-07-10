@@ -38,6 +38,9 @@
 #include <perfmon/pfmlib.h>
 #include <perfmon/perf_event.h>
 #include <perfmon/pfmlib_perf_event.h>
+
+#include <sys/sysinfo.h>
+
 #include "test_utils.h"
 #include "perf_helpers.h"
 
@@ -48,6 +51,9 @@
 #define MMAP_DATA_SIZE 8
 #define DEBUG 0
 #define AGGREGATE 0
+#define NUM_PROCS get_nprocs()
+
+
 //static int32_t init = 0;
 static int32_t quiet=0;
 static int* fds;
@@ -56,6 +62,8 @@ long long prev_head = 0;
 
 char *output_file;
 void *our_mmap;
+//struct mmap_info mmaps[NUM_PROCS];
+
 //#define SAMPLE_FREQUENCY 100000
 
 static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
@@ -98,16 +106,19 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 }
 
 /* Base API for simple write-out results */
-int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
+int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
                         int sample_type, int sample_period, char* filename) {
 
     int i, firstEvent, ret;
     int mmap_pages=1+MMAP_DATA_SIZE;
     int quiet = 0;
+	int NUM_CORES;
+	int * fds;
 
     struct perf_event_attr pe;
     struct sigaction sa;
     char test_string[]="Testing Intel PEBS support...";
+	//struct mmap_info mmaps[16];
 
 	/* Open and clear contents of file to record the sampling results */
 	FILE* fp = fopen(filename, "w");
@@ -116,8 +127,16 @@ int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 	/* Set global variable to be used by our signal handler */
 	output_file = filename;
 
+	NUM_CORES = get_nprocs();
+	if(!(NUM_CORES > 0))	{
+		printf("PANIC: SYSTEM DOESNT KNOW ABOUT ITS OWN CPU\n");
+		return -1;
+	}
+
+	struct mmap_info mmaps[NUM_PROCS];
+
 	/* Allocate as many file descriptors as events sampled */
-    fds = (int *)malloc(sizeof(int)*NumEvents);
+    fds = (int *)malloc(sizeof(int)*NumEvents*NUM_CORES);
 
 	ret = pfm_initialize();
     if (ret != PFM_SUCCESS)
@@ -139,8 +158,9 @@ int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 
 	/*	Setup perf_event_attr structures for each event and then
 		open a file descriptor for each */
-    for(i = 0; i < NumEvents; i++) {
+    for(i = 0; i < NUM_PROCS; i++) {
 
+		mmaps[i].cpu = i;
 		//TODO: before each event is processed into a pref_event_attr structure
 		// the PAPI version of the event must be translate to the string
 		// for the corresponding architecture in order to call libpfm4
@@ -152,14 +172,13 @@ int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 		/* 	For the first event the fourth arg to perf_event_open is -1
 			For subsequent events, the group_fd (first evend's fd) is used
 			for the fourth argument to link the events together */
-		if(firstEvent) {
 
 			if(DEBUG) {
 				printf("Value of i is %d\n \
 						Eventcode is 0x%x\n", i, pe.config);
 			}
-            fds[0] = perf_event_open(&pe,0,-1,-1,0);
-            if (fds[0] < 0) {
+            fds[i] = perf_event_open(&pe,0, i,-1,0);
+            if (mmaps[i].fd < 0) {
 	    		if (!quiet) {
 					fprintf(stderr,"Problem opening leader %s\n",
 					strerror(errno));
@@ -167,8 +186,8 @@ int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 				}
 				sample_type&=~PERF_SAMPLE_BRANCH_STACK;
 				pe.sample_type=sample_type;
-				fds[0]=perf_event_open(&pe,0,-1,-1,0);
-				if (fds[0]<0) {
+				fds[i] =perf_event_open(&pe,0, i,-1,0);
+				if (mmaps[i].fd <0) {
 					if (!quiet) {
 						fprintf(stderr,"Error opening leader %s\n",
 							strerror(errno));
@@ -177,48 +196,53 @@ int PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 				}
     			//test_fail(test_string);
     		}
-        }
-        else {
-            fds[i]=perf_event_open(&pe,0,-1,fds[0],0);
-        	if (fds[i]<0) {
-        		if (!quiet) fprintf(stderr,"Error opening %llx\n",pe.config);
-        		test_fail(test_string);
-        	}
 
-        }
 
 		/* 	Ensure only the first event uses -1 for the fourth arg to
 			perf_event_open */
-        if(i == 0)
-            firstEvent = 0;
+        //if(i == 0)
+         //   firstEvent = 0;
+	//	mmaps[i].sample_mmap = mmap(NULL, mmap_pages*getpagesize(),
+	//								PROT_READ | PROT_WRITE, MAP_SHARED,
+	//								mmaps[i].fd, 0);
+
+		/* SIGIO must be asynchronous because perf will write to the mmap and continue
+		to count simultaneously */
+	//	fcntl(mmaps[i].fd, F_SETFL, O_RDWR|O_NONBLOCK|O_ASYNC);
+		/* Associates our file descriptor with the appropriate signal */
+	//	fcntl(mmaps[i].fd, F_SETSIG, SIGIO);
+	//	fcntl(mmaps[i].fd, F_SETOWN,getpid());
+
     }
 
+	/*
+	fds = malloc(sizeof(int) *NUM_PROCS);
+	for(i = 0; i < NUM_PROCS; i++) {
+		fds[i] = mmaps[i].fd;
 
-	our_mmap=mmap(NULL, mmap_pages*getpagesize(),
-			PROT_READ|PROT_WRITE, MAP_SHARED, fds[0], 0);
+	}
 
-	/* SIGIO must be asynchronous because perf will write to the mmap and continue
-	to count simultaneously */
-	fcntl(fds[0], F_SETFL, O_RDWR|O_NONBLOCK|O_ASYNC);
-	/* Associates our file descriptor with the appropriate signal */
-	fcntl(fds[0], F_SETSIG, SIGIO);
-	fcntl(fds[0], F_SETOWN,getpid());
-
-    return PAPI_OK;
+	printf("NUM PROCS: %d\n", NUM_PROCS);
+	*/
+    return fds;
 
 
 }
 
 /* Function to call the ioctl's which will start the sampling process */
-int PAPI_sample_start(int Eventset) {
+int PAPI_sample_start(int * fd) {
 
-    int ret;
+    int ret, i;
 
-    if(fds[0] != NULL) {
+	printf("SIZE %d\n", sizeof(fd)/sizeof(fd[0]));
 
-    	ioctl(fds[0], PERF_EVENT_IOC_RESET, 0);
+	for(i = 0; i < NUM_PROCS; i++) {
 
-    	ret=ioctl(fds[0], PERF_EVENT_IOC_ENABLE,0);
+		printf("FD value: %d ------- I value: %d\n", fd[i], i);
+
+    	ioctl(fd[i], PERF_EVENT_IOC_RESET, 0);
+
+    	ret=ioctl(fd[i], PERF_EVENT_IOC_ENABLE,0);
 
     	if (ret<0) {
     		if (!quiet) {
@@ -310,6 +334,8 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 		attr.wakeup_events=1;
 	    attr.pinned=1;
 		attr.precise_ip=0;
+		attr.exclude_kernel=1;
+		attr.exclude_hv=1;
 		//attr.inherit=1;
     }
 	/* 	Setting disabled=0 for subsequent events will *NOT* cause them to start

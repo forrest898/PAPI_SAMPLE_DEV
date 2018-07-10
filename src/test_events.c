@@ -36,6 +36,7 @@ int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
 int main(int argc, char** argv) {
 
 	int ret, conv, i;
+	int * fds;
 	char *ev;
 	char *filename2 = "wowie";
 	char *br = "BR_";
@@ -98,13 +99,13 @@ int main(int argc, char** argv) {
 	//ev[1] = 36;
 
 	// initialize sampling
-	ret = PAPI_sample_init(1, ev, 1, sample_type, 100000, filename);
+	fds = PAPI_sample_init(1, ev, 1, sample_type, 100000, filename);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
 	}
 
-	ret = PAPI_sample_start(1);
+	ret = PAPI_sample_start(fds);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
@@ -114,7 +115,7 @@ int main(int argc, char** argv) {
 		naive_matrix_multiply(1);
 	}
 
-	ret = PAPI_sample_stop(1, 1);
+	//ret = PAPI_sample_stop(1, 1);
 	if(ret != PAPI_OK) {
 		printf("PANIC\n");
 		exit(1);
