@@ -20,4 +20,5 @@ How do we tie the sampling interface to an eventset considering that it is
 largely perf related and not PAPI code?
 
 7/10
-On looking into EventSets
+On looking into , where is _papi_hwd generated? How can I find the definitions
+for the functions associated with _papi_hwd?
