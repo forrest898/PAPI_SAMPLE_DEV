@@ -47,7 +47,7 @@
 
 #define MMAP_DATA_SIZE 8
 #define DEBUG 0
-#define AGGREGATE 1
+#define AGGREGATE 0
 //static int32_t init = 0;
 static int32_t quiet=0;
 static int* fds;
@@ -310,12 +310,13 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 		attr.wakeup_events=1;
 	    attr.pinned=1;
 		attr.precise_ip=0;
+		//attr.inherit=1;
     }
 	/* 	Setting disabled=0 for subsequent events will *NOT* cause them to start
  		counting until the group fd has started counting */
 	else {
 	    attr.pinned=1;
-		attr.sample_type=PERF_SAMPLE_RAW;
+		attr.sample_type=PERF_SAMPLE_READ;
 		attr.read_format=PERF_FORMAT_GROUP|PERF_FORMAT_ID;
 	    attr.disabled=0;
 	}
