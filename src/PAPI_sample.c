@@ -95,6 +95,7 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 	}
 	else
 		our_mmap = &events[-(((fd-4)*0x9000)/8) - (0x6e000 - 0x9000)/8];
+	printf("POINTER FD location: %p\n", &fd);
 	printf("%p\n", our_mmap);
 
 //	our_mmap = &events[(-fd*0x8000)/16];

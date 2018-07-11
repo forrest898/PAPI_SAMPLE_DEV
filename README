@@ -61,3 +61,8 @@ Started the transition to multicore. Encountering some struggles:
 		I would think local modification makes sense to abstract complication
 		of mmap from user.
 		Back to issue number 1....
+
+7/11
+Devised an awful solution for MMAPing that is working on my computer for one
+test program. It's all hard coded and really isnt a solution at all, I just
+wanted to see it work and get me going in the right direction...
