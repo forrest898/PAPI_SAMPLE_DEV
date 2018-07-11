@@ -52,6 +52,8 @@
 #define PAPI_RTM_RETIRED_ABORTED	49
 #define PAPI_INST_RETIRED_TOTAL_INST    50
 
+
+
 typedef struct mmap_info;
 struct mmap_info {
     void* sample_mmap;
@@ -59,15 +61,16 @@ struct mmap_info {
     int fd;
 };
 
+
 int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
     int sample_type, int sample_period, char* filename);
 
 struct perf_event_attr setup_perf(int EventCode, int sample_type,
     int sample_period, int firstEvent);
 
-int PAPI_sample_start(int * Eventset);
+int PAPI_sample_start(int * fd);
 
-int PAPI_sample_stop(int Eventset, int NumEvents);
+int PAPI_sample_stop(int * fd, int NumEvents);
 
 struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
                                     int sample_period, int firstEvent);

@@ -24,7 +24,15 @@
 #include <perfmon/pfmlib_perf_event.h>
 #include "perf_helpers.h"
 #include <papi.h>
+#include <sys/sysinfo.h>
 #include "matrix_multiply.h"
+
+#define MMAP_DATA_SIZE 8
+#define NUM_PROCS get_nprocs()
+
+struct mmap_info events[8];
+
+
 
 int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
 		PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
@@ -40,8 +48,10 @@ int main(int argc, char** argv) {
 	char *ev;
 	char *filename2 = "wowie";
 	char *br = "BR_";
+	FILE* log;
+	//void **mmaps;
+	int mmap_pages = MMAP_DATA_SIZE + 1;
 	PAPI_hw_info_t* hwinfo;
-	// /FILE *fp;
 
 	if(argc != 3) {
 		printf("Please pass the req'd args\n");
@@ -66,6 +76,11 @@ int main(int argc, char** argv) {
 	}
 
 	PAPI_library_init(PAPI_VER_CURRENT);
+
+
+	log = fopen("logging", "w");
+	fclose(log);
+	log = fopen("logging","a");
 
 	/* 	TODO:
 		Use the hardware info and the INTEL manual to sort processor by
@@ -101,14 +116,30 @@ int main(int argc, char** argv) {
 	// initialize sampling
 	fds = PAPI_sample_init(1, ev, 1, sample_type, 100000, filename);
 	if(ret != PAPI_OK) {
-		printf("PANIC\n");
-		exit(1);
+		printf("PANIC1\n");
+		//exit(1);
 	}
+
+	for(i = 0; i < NUM_PROCS; i++) {
+
+		events[i].sample_mmap=mmap(NULL, mmap_pages*getpagesize(),
+				PROT_READ|PROT_WRITE, MAP_SHARED, fds[i], 0);
+
+		printf("i is %d, event location is %p and mmap location is %p\n", i, events[i], events[i].sample_mmap);
+
+		fcntl(fds[i], F_SETFL, O_RDWR|O_NONBLOCK|O_ASYNC);
+		fcntl(fds[i], F_SETSIG, SIGIO);
+		fcntl(fds[i], F_SETOWN,getpid());
+
+	}
+
+	if(events[0].sample_mmap == NULL)
+		printf("everything is broken\n");
 
 	ret = PAPI_sample_start(fds);
 	if(ret != PAPI_OK) {
-		printf("PANIC\n");
-		exit(1);
+		printf("PANIC2\n");
+		//exit(1);
 	}
 
 	for(i = 0; i < 1; i++) {
@@ -117,10 +148,11 @@ int main(int argc, char** argv) {
 
 	//ret = PAPI_sample_stop(1, 1);
 	if(ret != PAPI_OK) {
-		printf("PANIC\n");
+		printf("PANIC3\n");
 		exit(1);
 	}
 
+	fclose(log);
 	return 0;
 
 }

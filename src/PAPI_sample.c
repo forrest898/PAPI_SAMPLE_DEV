@@ -62,6 +62,9 @@ long long prev_head = 0;
 
 char *output_file;
 void *our_mmap;
+
+extern struct mmap_info * events;
+
 //struct mmap_info mmaps[NUM_PROCS];
 
 //#define SAMPLE_FREQUENCY 100000
@@ -84,9 +87,12 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 	//printf("Handler!\n");
 	/* Disable counters in order to perform MMAP read */
 	ret=ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
+	//if(events[(fd-3)].sample_mmap == NULL) {	printf("SHIT\n");}
+	printf("%d\n", fd);
 
+	printf("%p\n", &events[-fd]);
 
-
+	our_mmap = &events[-fd];
 
 	/* Parse MMAP and read out our sampled values*/
 	prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
@@ -234,7 +240,7 @@ int PAPI_sample_start(int * fd) {
 
     int ret, i;
 
-	printf("SIZE %d\n", sizeof(fd)/sizeof(fd[0]));
+	//printf("SIZE %d\n", sizeof(fd)/sizeof(fd[0]));
 
 	for(i = 0; i < NUM_PROCS; i++) {
 
@@ -255,28 +261,28 @@ int PAPI_sample_start(int * fd) {
 
     }
 
-
     return PAPI_OK;
 
 }
 
 /* Function to call the ioctl's to stop sampling and perform memory cleanup */
-int PAPI_sample_stop(int Eventset, int NumEvents) {
+int PAPI_sample_stop(int * fd, int NumEvents) {
 
     int ret, i, count;
 
-	ret=ioctl(fds[0], PERF_EVENT_IOC_REFRESH,0);
-    printf("File ready for parsing\n");
+	for(i = 0; i < NUM_PROCS; i++) {
+		ret=ioctl(fd[i], PERF_EVENT_IOC_REFRESH,0);
+    	printf("File ready for parsing\n");
 
- 	ret=ioctl(fds[0], PERF_EVENT_IOC_DISABLE, 0);
-
+ 		ret=ioctl(fd[i], PERF_EVENT_IOC_DISABLE, 0);
+	}
 	if(AGGREGATE) {
 		long long meow;
 		read(fds[0], &meow, sizeof(long long));
 		printf("Event count: %lld\n", meow);
 	}
 	/* Close the perf_event_open fd's */
-	for(i=(NumEvents-1); i >= 0; i--) {
+	for(i=0; i < NUM_PROCS; i++) {
 		//printf("Closing fds[%d]\n", i);
 		close(fds[i]);
 	}
