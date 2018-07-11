@@ -331,8 +331,8 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 	FILE *fp;
 
 
-	//fp = fopen(file, "a");
-	fp = stdout;
+	fp = fopen(file, "a");
+	//fp = stdout;
 
 	unsigned char *data;
 
@@ -1153,7 +1153,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 	control_page->data_tail=head;
 
 	free(data);
-//	fclose(fp);
+	fclose(fp);
 
 	return head;
 

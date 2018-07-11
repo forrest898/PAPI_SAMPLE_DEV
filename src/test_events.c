@@ -121,11 +121,17 @@ int main(int argc, char** argv) {
 	}
 
 	for(i = 0; i < NUM_PROCS; i++) {
+		printf("i is %d, event location is %p and mmap location is %p\n",
+ 					i, events[i], events[i].sample_mmap);
+	}
+
+	for(i = 0; i < NUM_PROCS; i++) {
 
 		events[i].sample_mmap=mmap(NULL, mmap_pages*getpagesize(),
 				PROT_READ|PROT_WRITE, MAP_SHARED, fds[i], 0);
 
-		printf("i is %d, event location is %p and mmap location is %p\n", i, events[i], events[i].sample_mmap);
+		printf("i is %d, event location is %p and mmap location is %p\n",
+ 					i, events[i], events[i].sample_mmap);
 
 		fcntl(fds[i], F_SETFL, O_RDWR|O_NONBLOCK|O_ASYNC);
 		fcntl(fds[i], F_SETSIG, SIGIO);
