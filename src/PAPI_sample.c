@@ -90,7 +90,11 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 	//if(events[(fd-3)].sample_mmap == NULL) {	printf("SHIT\n");}
 	printf("%d\n", fd);
 
-	our_mmap = &events[-(((fd-4)*0x9000)/8)];
+	if(fd <= 6) {
+		our_mmap = &events[-(((fd-4)*0x9000)/8)];
+	}
+	else
+		our_mmap = &events[-(((fd-4)*0x9000)/8) - (0x6e000 - 0x9000)/8];
 	printf("%p\n", our_mmap);
 
 //	our_mmap = &events[(-fd*0x8000)/16];

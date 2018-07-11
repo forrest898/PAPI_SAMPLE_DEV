@@ -30,7 +30,7 @@
 #define MMAP_DATA_SIZE 8
 #define NUM_PROCS get_nprocs()
 
-struct mmap_info events[8];
+struct mmap_info events[24];
 
 
 
@@ -127,6 +127,7 @@ int main(int argc, char** argv) {
 
 	for(i = 0; i < NUM_PROCS; i++) {
 
+		printf("SIZE MY HOMBRE 0x%x", mmap_pages*getpagesize());
 		events[i].sample_mmap=mmap(NULL, mmap_pages*getpagesize(),
 				PROT_READ|PROT_WRITE, MAP_SHARED, fds[i], 0);
 
