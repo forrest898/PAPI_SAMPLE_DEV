@@ -90,9 +90,10 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 	//if(events[(fd-3)].sample_mmap == NULL) {	printf("SHIT\n");}
 	printf("%d\n", fd);
 
-	printf("%p\n", &events[-fd]);
+	our_mmap = &events[-(((fd-3)*0x9000)/8)];
+	printf("%p\n", our_mmap);
 
-	our_mmap = &events[-fd];
+//	our_mmap = &events[(-fd*0x8000)/16];
 
 	/* Parse MMAP and read out our sampled values*/
 	prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
@@ -166,7 +167,7 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 		open a file descriptor for each */
     for(i = 0; i < NUM_PROCS; i++) {
 
-		mmaps[i].cpu = i;
+		//mmaps[i].cpu = i;
 		//TODO: before each event is processed into a pref_event_attr structure
 		// the PAPI version of the event must be translate to the string
 		// for the corresponding architecture in order to call libpfm4
@@ -184,7 +185,7 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 						Eventcode is 0x%x\n", i, pe.config);
 			}
             fds[i] = perf_event_open(&pe,0, i,-1,0);
-            if (mmaps[i].fd < 0) {
+            if (fds[i] < 0) {
 	    		if (!quiet) {
 					fprintf(stderr,"Problem opening leader %s\n",
 					strerror(errno));
@@ -193,7 +194,7 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 				sample_type&=~PERF_SAMPLE_BRANCH_STACK;
 				pe.sample_type=sample_type;
 				fds[i] =perf_event_open(&pe,0, i,-1,0);
-				if (mmaps[i].fd <0) {
+				if (fds[i] <0) {
 					if (!quiet) {
 						fprintf(stderr,"Error opening leader %s\n",
 							strerror(errno));

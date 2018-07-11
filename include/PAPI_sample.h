@@ -57,8 +57,6 @@
 typedef struct mmap_info;
 struct mmap_info {
     void* sample_mmap;
-    int cpu;
-    int fd;
 };
 
 
