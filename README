@@ -66,3 +66,18 @@ Started the transition to multicore. Encountering some struggles:
 Devised an awful solution for MMAPing that is working on my computer for one
 test program. It's all hard coded and really isnt a solution at all, I just
 wanted to see it work and get me going in the right direction...
+
+The current implementation has the user managing the mmaps with a lot of
+convoluted PAPI side code just to make the MMAPs work for my machine.
+	Tomorrow:
+		Try moving the MMAPs back to the PAPI side as it is much easier than
+		trying to track down memory addresses and page boundaries. PAPI_sample
+		should always be able to find the address of the mmap and should have
+		to do the weird conversion using the negative indexed array
+		(stack grows down).
+
+		The other thing you could try is making a hash of fd to location of the
+		mmap on the user side and pass that to PAPI_sample. It would solve the
+		hard-coded offsets that I'm currently using for my machine. Still think
+		option number 1 is probably better as I spent the entire day chasing
+		around addresses for mmaps.
