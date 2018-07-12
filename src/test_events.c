@@ -30,7 +30,7 @@
 #define MMAP_DATA_SIZE 8
 #define NUM_PROCS get_nprocs()
 
-struct mmap_info events[24];
+// s/truct mmap_info events[24];
 
 
 
@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
 		printf("PANIC1\n");
 		//exit(1);
 	}
-
+/*
 	for(i = 0; i < NUM_PROCS; i++) {
 		printf("i is %d, event location is %p and mmap location is %p\n",
  					i, events[i], events[i].sample_mmap);
@@ -138,10 +138,10 @@ int main(int argc, char** argv) {
 		fcntl(fds[i], F_SETSIG, SIGIO);
 		fcntl(fds[i], F_SETOWN,getpid());
 
-	}
+	}*/
 
-	if(events[0].sample_mmap == NULL)
-		printf("everything is broken\n");
+//	if(events[0].sample_mmap == NULL)
+//		printf("everything is broken\n");
 
 	ret = PAPI_sample_start(fds);
 	if(ret != PAPI_OK) {

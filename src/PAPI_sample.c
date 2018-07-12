@@ -63,7 +63,7 @@ long long prev_head = 0;
 char *output_file;
 void *our_mmap;
 
-extern struct mmap_info * events;
+struct mmap_info * events;
 
 //struct mmap_info mmaps[NUM_PROCS];
 
@@ -89,7 +89,6 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 	ret=ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
 	//if(events[(fd-3)].sample_mmap == NULL) {	printf("SHIT\n");}
 	printf("%d\n", fd);
-
 	if(fd <= 6) {
 		our_mmap = &events[-(((fd-4)*0x9000)/8)];
 	}
@@ -145,7 +144,7 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 		return -1;
 	}
 
-	struct mmap_info mmaps[NUM_PROCS];
+	//struct mmap_info events[NUM_PROCS];
 
 	/* Allocate as many file descriptors as events sampled */
     fds = (int *)malloc(sizeof(int)*NumEvents*NUM_CORES);

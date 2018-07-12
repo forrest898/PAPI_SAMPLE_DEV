@@ -72,9 +72,13 @@ convoluted PAPI side code just to make the MMAPs work for my machine.
 	Tomorrow:
 		Try moving the MMAPs back to the PAPI side as it is much easier than
 		trying to track down memory addresses and page boundaries. PAPI_sample
-		should always be able to find the address of the mmap and should have
+		should always be able to find the address of the mmap and shouldn't have
 		to do the weird conversion using the negative indexed array
-		(stack grows down).
+		(stack grows down). Change the strcture mmap_info to have the fd as
+		well. Check each fd against the fd in the array of structures. Be
+		sure to keep a count as to how long the structure is (still not
+		convinced this implementation is going to work).
+
 
 		The other thing you could try is making a hash of fd to location of the
 		mmap on the user side and pass that to PAPI_sample. It would solve the
