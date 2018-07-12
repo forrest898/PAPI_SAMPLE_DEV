@@ -52,12 +52,13 @@
 #define PAPI_RTM_RETIRED_ABORTED	49
 #define PAPI_INST_RETIRED_TOTAL_INST    50
 
-extern struct mmap_info * events;
+//extern struct mmap_info * events;
 
-typedef struct mmap_info;
-struct mmap_info {
+typedef struct {
     void* sample_mmap;
-};
+    int * fd;
+    long long * prev_head;
+} mmap_info;
 
 
 int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,

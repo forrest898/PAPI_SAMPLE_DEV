@@ -56,14 +56,26 @@
 
 //static int32_t init = 0;
 static int32_t quiet=0;
-static int* fds;
+static int * fds;
 
 long long prev_head = 0;
 
 char *output_file;
 void *our_mmap;
 
-struct mmap_info * events;
+mmap_info mmaps[100];
+int num_maps = 0;
+
+int read_format_handle = PERF_FORMAT_GROUP |
+   	PERF_FORMAT_ID |
+    PERF_FORMAT_TOTAL_TIME_ENABLED |
+    PERF_FORMAT_TOTAL_TIME_RUNNING;
+int sample_type_handle=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
+	PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
+	PERF_SAMPLE_ID | PERF_SAMPLE_CPU | PERF_SAMPLE_PERIOD |
+	PERF_SAMPLE_STREAM_ID | PERF_SAMPLE_RAW |
+	PERF_SAMPLE_DATA_SRC;
+
 
 //struct mmap_info mmaps[NUM_PROCS];
 
@@ -71,23 +83,33 @@ struct mmap_info * events;
 
 static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 
-	int ret;
+	int ret, i;
 
 	int fd = info->si_fd;
-    int read_format = PERF_FORMAT_GROUP |
-        PERF_FORMAT_ID |
-        PERF_FORMAT_TOTAL_TIME_ENABLED |
-        PERF_FORMAT_TOTAL_TIME_RUNNING;
-	int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
-			PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
-			PERF_SAMPLE_ID | PERF_SAMPLE_CPU | PERF_SAMPLE_PERIOD |
-			PERF_SAMPLE_STREAM_ID | PERF_SAMPLE_RAW |
-			PERF_SAMPLE_DATA_SRC;
+
+	long long prev_head;
 
 	//printf("Handler!\n");
 	/* Disable counters in order to perform MMAP read */
 	ret=ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
 	//if(events[(fd-3)].sample_mmap == NULL) {	printf("SHIT\n");}
+	printf("Interupt with file handle %d\n", fd);
+
+	for(i = 0; i < num_maps; i++) {
+		if((*(mmaps[i].fd)) == fd) {
+			printf("i is %d\n", i);
+			prev_head = *(mmaps[i].prev_head);
+			our_mmap = mmaps[i].sample_mmap;
+			break;
+		}
+		if(i == (num_maps -1))	{
+			printf("I never found my mmap/fd ");
+			exit(1);
+		}
+
+	}
+
+	/*
 	printf("%d\n", fd);
 	if(fd <= 6) {
 		our_mmap = &events[-(((fd-4)*0x9000)/8)];
@@ -98,16 +120,18 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 	printf("%p\n", our_mmap);
 
 //	our_mmap = &events[(-fd*0x8000)/16];
-
+	*/
 	/* Parse MMAP and read out our sampled values*/
 	prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
-		sample_type,read_format,
+		sample_type_handle,read_format_handle,
 		0, /* reg_mask */
 		NULL, /*validate */
 		quiet,
 		NULL, /* events read */
 		RAW_NONE,
 		output_file);
+
+	*(mmaps[i].prev_head) = prev_head;
 
 	/* Re-enable counters */
 	ret=ioctl(fd, PERF_EVENT_IOC_REFRESH, 1);
@@ -125,6 +149,7 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
     int quiet = 0;
 	int NUM_CORES;
 	int * fds;
+	long long * heads;
 
     struct perf_event_attr pe;
     struct sigaction sa;
@@ -148,6 +173,7 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 
 	/* Allocate as many file descriptors as events sampled */
     fds = (int *)malloc(sizeof(int)*NumEvents*NUM_CORES);
+	heads = (long long *)calloc(NumEvents*NUM_CORES, sizeof(long long));
 
 	ret = pfm_initialize();
     if (ret != PFM_SUCCESS)
@@ -213,16 +239,20 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 			perf_event_open */
         //if(i == 0)
          //   firstEvent = 0;
-	//	mmaps[i].sample_mmap = mmap(NULL, mmap_pages*getpagesize(),
-	//								PROT_READ | PROT_WRITE, MAP_SHARED,
-	//								mmaps[i].fd, 0);
-
+		mmaps[i].sample_mmap = mmap(NULL, mmap_pages*getpagesize(),
+									PROT_READ | PROT_WRITE, MAP_SHARED,
+									fds[i], 0);
+		mmaps[i].fd = &fds[i];
+		mmaps[i].prev_head = &heads[i];
+		printf("ADDR MAP %p ... VALUE FD %d ... ADDR HEAD %p\n",
+ 				mmaps[i].sample_mmap, *(mmaps[i].fd), mmaps[i].prev_head);
+		num_maps++;
 		/* SIGIO must be asynchronous because perf will write to the mmap and continue
 		to count simultaneously */
-	//	fcntl(mmaps[i].fd, F_SETFL, O_RDWR|O_NONBLOCK|O_ASYNC);
+		fcntl(fds[i], F_SETFL, O_RDWR|O_NONBLOCK|O_ASYNC);
 		/* Associates our file descriptor with the appropriate signal */
-	//	fcntl(mmaps[i].fd, F_SETSIG, SIGIO);
-	//	fcntl(mmaps[i].fd, F_SETOWN,getpid());
+		fcntl(fds[i], F_SETSIG, SIGIO);
+		fcntl(fds[i], F_SETOWN,getpid());
 
     }
 
@@ -281,22 +311,28 @@ int PAPI_sample_stop(int * fd, int NumEvents) {
 
  		ret=ioctl(fd[i], PERF_EVENT_IOC_DISABLE, 0);
 	}
+
+	/*
 	if(AGGREGATE) {
 		long long meow;
 		read(fds[0], &meow, sizeof(long long));
 		printf("Event count: %lld\n", meow);
 	}
+	*/
 	/* Close the perf_event_open fd's */
 	for(i=0; i < NUM_PROCS; i++) {
 		//printf("Closing fds[%d]\n", i);
-		close(fds[i]);
+		close(fd[i]);
 	}
 
 	/* Unmap the MMAP */
-	munmap(our_mmap, 1+MMAP_DATA_SIZE*getpagesize());
-
+	for(i = 0; i < num_maps; i++) {
+		munmap(mmaps[i].sample_mmap, 1+MMAP_DATA_SIZE*getpagesize());
+		free(mmaps[i].prev_head);
+	}
 	/* Free perf_event_open FD's */
 	free(fds);
+
 
     return PAPI_OK;
 

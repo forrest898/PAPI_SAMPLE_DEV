@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
 		naive_matrix_multiply(1);
 	}
 
-	//ret = PAPI_sample_stop(1, 1);
+	ret = PAPI_sample_stop(fds, 1);
 	if(ret != PAPI_OK) {
 		printf("PANIC3\n");
 		exit(1);
