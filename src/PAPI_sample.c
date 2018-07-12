@@ -57,6 +57,7 @@
 //static int32_t init = 0;
 static int32_t quiet=0;
 static int * fds;
+long long * heads;
 
 long long prev_head = 0;
 
@@ -93,11 +94,11 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 	/* Disable counters in order to perform MMAP read */
 	ret=ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
 	//if(events[(fd-3)].sample_mmap == NULL) {	printf("SHIT\n");}
-	printf("Interupt with file handle %d\n", fd);
+	//printf("Interupt with file handle %d\n", fd);
 
 	for(i = 0; i < num_maps; i++) {
 		if((*(mmaps[i].fd)) == fd) {
-			printf("i is %d\n", i);
+			//printf("i is %d\n", i);
 			prev_head = *(mmaps[i].prev_head);
 			our_mmap = mmaps[i].sample_mmap;
 			break;
@@ -109,18 +110,7 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 
 	}
 
-	/*
-	printf("%d\n", fd);
-	if(fd <= 6) {
-		our_mmap = &events[-(((fd-4)*0x9000)/8)];
-	}
-	else
-		our_mmap = &events[-(((fd-4)*0x9000)/8) - (0x6e000 - 0x9000)/8];
-	printf("POINTER FD location: %p\n", &fd);
-	printf("%p\n", our_mmap);
 
-//	our_mmap = &events[(-fd*0x8000)/16];
-	*/
 	/* Parse MMAP and read out our sampled values*/
 	prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
 		sample_type_handle,read_format_handle,
@@ -148,8 +138,8 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
     int mmap_pages=1+MMAP_DATA_SIZE;
     int quiet = 0;
 	int NUM_CORES;
-	int * fds;
-	long long * heads;
+	//int * fds;
+
 
     struct perf_event_attr pe;
     struct sigaction sa;
@@ -168,8 +158,6 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 		printf("PANIC: SYSTEM DOESNT KNOW ABOUT ITS OWN CPU\n");
 		return -1;
 	}
-
-	//struct mmap_info events[NUM_PROCS];
 
 	/* Allocate as many file descriptors as events sampled */
     fds = (int *)malloc(sizeof(int)*NumEvents*NUM_CORES);
@@ -197,7 +185,6 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 		open a file descriptor for each */
     for(i = 0; i < NUM_PROCS; i++) {
 
-		//mmaps[i].cpu = i;
 		//TODO: before each event is processed into a pref_event_attr structure
 		// the PAPI version of the event must be translate to the string
 		// for the corresponding architecture in order to call libpfm4
@@ -205,10 +192,6 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 		memset(&pe,0,sizeof(struct perf_event_attr));
        //pe = setup_perf(EventCodes[i], sample_type, sample_period, firstEvent);
 		pe = new_setup_perf(EventCodes, sample_type, sample_period, firstEvent);
-
-		/* 	For the first event the fourth arg to perf_event_open is -1
-			For subsequent events, the group_fd (first evend's fd) is used
-			for the fourth argument to link the events together */
 
 			if(DEBUG) {
 				printf("Value of i is %d\n \
@@ -244,8 +227,8 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 									fds[i], 0);
 		mmaps[i].fd = &fds[i];
 		mmaps[i].prev_head = &heads[i];
-		printf("ADDR MAP %p ... VALUE FD %d ... ADDR HEAD %p\n",
- 				mmaps[i].sample_mmap, *(mmaps[i].fd), mmaps[i].prev_head);
+	//	printf("ADDR MAP %p ... VALUE FD %d ... ADDR HEAD %p\n",
+ 	//			mmaps[i].sample_mmap, *(mmaps[i].fd), mmaps[i].prev_head);
 		num_maps++;
 		/* SIGIO must be asynchronous because perf will write to the mmap and continue
 		to count simultaneously */
@@ -256,18 +239,7 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 
     }
 
-	/*
-	fds = malloc(sizeof(int) *NUM_PROCS);
-	for(i = 0; i < NUM_PROCS; i++) {
-		fds[i] = mmaps[i].fd;
-
-	}
-
-	printf("NUM PROCS: %d\n", NUM_PROCS);
-	*/
     return fds;
-
-
 }
 
 /* Function to call the ioctl's which will start the sampling process */
@@ -275,11 +247,9 @@ int PAPI_sample_start(int * fd) {
 
     int ret, i;
 
-	//printf("SIZE %d\n", sizeof(fd)/sizeof(fd[0]));
-
 	for(i = 0; i < NUM_PROCS; i++) {
 
-		printf("FD value: %d ------- I value: %d\n", fd[i], i);
+		//printf("FD value: %d ------- I value: %d\n", fd[i], i);
 
     	ioctl(fd[i], PERF_EVENT_IOC_RESET, 0);
 
@@ -328,11 +298,11 @@ int PAPI_sample_stop(int * fd, int NumEvents) {
 	/* Unmap the MMAP */
 	for(i = 0; i < num_maps; i++) {
 		munmap(mmaps[i].sample_mmap, 1+MMAP_DATA_SIZE*getpagesize());
-		free(mmaps[i].prev_head);
+		//free(mmaps[i].prev_head);
 	}
 	/* Free perf_event_open FD's */
 	free(fds);
-
+	free(heads);
 
     return PAPI_OK;
 

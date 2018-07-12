@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
 	//ev[1] = 36;
 
 	// initialize sampling
-	fds = PAPI_sample_init(1, ev, 1, sample_type, 100000, filename);
+	fds = PAPI_sample_init(1, ev, 1, sample_type, 5, filename);
 	if(ret != PAPI_OK) {
 		printf("PANIC1\n");
 		//exit(1);

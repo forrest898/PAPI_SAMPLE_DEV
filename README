@@ -85,3 +85,11 @@ convoluted PAPI side code just to make the MMAPs work for my machine.
 		hard-coded offsets that I'm currently using for my machine. Still think
 		option number 1 is probably better as I spent the entire day chasing
 		around addresses for mmaps.
+
+7/12
+UPDATE!!!! I got multicore working pretty fast this morning. :) still need to
+check results for "PESKY" events, but I think everything should be as before.
+
+Seems as if all the normal events were working for the naive test. About to
+push the code as it currently is. Currently working to see if the code is
+working in linpack. This should test the multicore capabilities.
