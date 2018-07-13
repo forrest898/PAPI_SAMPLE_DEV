@@ -58,11 +58,13 @@
 static int32_t quiet=0;
 static int * fds;
 long long * heads;
+unsigned char * data;
 
 long long prev_head = 0;
 
 char *output_file;
 void *our_mmap;
+FILE* fp;
 
 mmap_info mmaps[100];
 int num_maps = 0;
@@ -106,7 +108,6 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 
 	}
 
-	printf("before hang\n");
 	/* Parse MMAP and read out our sampled values*/
 	prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
 		sample_type_handle,read_format_handle,
@@ -115,16 +116,14 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 		quiet,
 		NULL, /* events read */
 		RAW_NONE,
-		output_file);
-	printf("after hang\n");
+		fp,
+		data);
 
 	*(mmaps[i].prev_head) = prev_head;
-	printf("after hang2\n");
 
 	/* Re-enable counters */
 	ret=ioctl(fd, PERF_EVENT_IOC_REFRESH, 1);
 
-	printf("after hang3\n");
 	(void) ret;
 
 }
@@ -144,10 +143,30 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
     struct sigaction sa;
     char test_string[]="Testing Intel PEBS support...";
 	//struct mmap_info mmaps[16];
+	long long bytesize;
+
+	bytesize = MMAP_DATA_SIZE*getpagesize();
+	printf("Bytesize %lld\n", bytesize);
+
+	data=malloc(bytesize);
+	if (data==NULL) {
+		printf("data was null somehow");
+		return -1;
+	}
+
 
 	/* Open and clear contents of file to record the sampling results */
-	FILE* fp = fopen(filename, "w");
+	fp = fopen(filename, "w");
+	if(fp == NULL) {
+		printf("Could not open file for logging\n");
+		exit(1);
+	}
 	fclose(fp);
+	fp = fopen(filename, "a");
+	if(fp == NULL) {
+		printf("Could not open file for logging\n");
+		exit(1);
+	}
 
 	/* Set global variable to be used by our signal handler */
 	output_file = filename;
@@ -299,9 +318,12 @@ int PAPI_sample_stop(int * fd, int NumEvents) {
 		munmap(mmaps[i].sample_mmap, 1+MMAP_DATA_SIZE*getpagesize());
 		//free(mmaps[i].prev_head);
 	}
+
+	fclose(fp);
 	/* Free perf_event_open FD's */
 	free(fds);
 	free(heads);
+	free(data);
 
     return PAPI_OK;
 

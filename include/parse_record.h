@@ -15,4 +15,4 @@ long long perf_mmap_read(
 		int sample_type, int read_format, long long reg_mask,
 		struct validate_values *validate,
 		int quiet, int *events_read,
-		int raw_type, char* file);
+		int raw_type, FILE* fp, unsigned char * data);

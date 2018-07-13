@@ -41,7 +41,7 @@ static int handle_struct_read_format(unsigned char *sample,
 
 	int offset=0,i;
 
-	printf("in read_format\n");
+	// /printf("in read_format\n");
 	if (read_format & PERF_FORMAT_GROUP) {
 		long long nr,time_enabled,time_running;
 
@@ -323,34 +323,23 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			int sample_type, int read_format, long long reg_mask,
 			struct validate_values *validate,
 			int quiet, int *events_read,
-			int raw_type, char* file) {
+			int raw_type, FILE* fp, unsigned char * data) {
 
-	printf("into parse_record\n");
 
 	struct perf_event_mmap_page *control_page = our_mmap;
 	long long head,offset;
 	int i,size;
 	long long bytesize,prev_head_wrap;
-	FILE *fp;
 
-	printf("into parse_record2\n");
-
-	fp = fopen(file, "a");
-	printf("into parse_record2.48\n");
 
 	if(fp == NULL) {
 		printf("Error opening file to record samples.\n");
 		exit(1);
 	}
-	//fp = stdout;
-	printf("into parse_record2.49\n");
 
-	unsigned char *data;
-	printf("into parse_record2.5\n");
+	//unsigned char *data;
 
 	void *data_mmap=our_mmap+getpagesize();
-
-	printf("into parse_record3\n");
 
 
 	if (mmap_size==0) {
@@ -363,13 +352,11 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 		return -1;
 	}
 
-		printf("into parse_record4\n");
-
 	head=control_page->data_head;
 	rmb(); /* Must always follow read of data_head */
-		printf("into parse_record5\n");
 
 	size=head-prev_head;
+
 
 	if (debug) {
 		fprintf(fp, "Head: %lld Prev_head=%lld\n",head,prev_head);
@@ -378,15 +365,19 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 
 	bytesize=mmap_size*getpagesize();
 
+
 	if (size>bytesize) {
-		fprintf(fp, "error!  we overflowed the mmap buffer %d>%lld bytes\n",
+		fprintf(stderr, "error!  we overflowed the mmap buffer %d>%lld bytes\n",
 			size,bytesize);
 	}
 
+	/*
 	data=malloc(bytesize);
 	if (data==NULL) {
+		printf("data was null somehow");
 		return -1;
 	}
+	*/
 
 	if (debug) {
 		fprintf(fp, "Allocated %lld bytes at %p\n",bytesize,data);
@@ -1170,10 +1161,12 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 	}
 
 //	mb();
+
+	memset(data, 0, bytesize);
 	control_page->data_tail=head;
 
-	free(data);
-	fclose(fp);
+	//free(data);
+	//fclose(fp);
 
 	return head;
 
