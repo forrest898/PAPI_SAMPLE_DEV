@@ -93,3 +93,9 @@ check results for "PESKY" events, but I think everything should be as before.
 Seems as if all the normal events were working for the naive test. About to
 push the code as it currently is. Currently working to see if the code is
 working in linpack. This should test the multicore capabilities.
+
+7/13
+Testing with the base HPL.dat that linpack produces has revealed there is an
+issue with the multithreaded sampling. linpack will occasionally just hang,
+holding all of the threads its using at 100% CPU. The sampling interface
+stops recording results and the code will hang forever.

@@ -277,7 +277,7 @@ int PAPI_sample_stop(int * fd, int NumEvents) {
 
 	for(i = 0; i < NUM_PROCS; i++) {
 		ret=ioctl(fd[i], PERF_EVENT_IOC_REFRESH,0);
-    	printf("File ready for parsing\n");
+    	//printf("File ready for parsing\n");
 
  		ret=ioctl(fd[i], PERF_EVENT_IOC_DISABLE, 0);
 	}
