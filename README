@@ -99,3 +99,13 @@ Testing with the base HPL.dat that linpack produces has revealed there is an
 issue with the multithreaded sampling. linpack will occasionally just hang,
 holding all of the threads its using at 100% CPU. The sampling interface
 stops recording results and the code will hang forever.
+
+I tracked down the error in the code that was causing linpack to hang forever.
+The data array that was previously holding the values copied from the mmap
+was being malloced inside of parse_record. This became an issue when the
+signal handler was called when linpack was calling malloc. Linpack has the
+memory lock but the signal handler also tries to take it via parse_record and
+becomes stuck in deadlock. The solution is to move the malloc for that data
+array into the initialization for PAPI_sample and then just pass the location
+of the memory to the handler. In addition, the data buffer is memset to 0
+at the end of every parse_record.
