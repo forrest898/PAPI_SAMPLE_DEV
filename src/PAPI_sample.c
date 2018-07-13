@@ -71,11 +71,7 @@ int read_format_handle = PERF_FORMAT_GROUP |
    	PERF_FORMAT_ID |
     PERF_FORMAT_TOTAL_TIME_ENABLED |
     PERF_FORMAT_TOTAL_TIME_RUNNING;
-int sample_type_handle=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
-	PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
-	PERF_SAMPLE_ID | PERF_SAMPLE_CPU | PERF_SAMPLE_PERIOD |
-	PERF_SAMPLE_STREAM_ID | PERF_SAMPLE_RAW |
-	PERF_SAMPLE_DATA_SRC;
+int sample_type_handle=PERF_SAMPLE_IP | PERF_SAMPLE_READ | PERF_SAMPLE_CPU;
 
 
 //struct mmap_info mmaps[NUM_PROCS];
@@ -110,7 +106,7 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 
 	}
 
-
+	printf("before hang\n");
 	/* Parse MMAP and read out our sampled values*/
 	prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
 		sample_type_handle,read_format_handle,
@@ -120,12 +116,15 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 		NULL, /* events read */
 		RAW_NONE,
 		output_file);
+	printf("after hang\n");
 
 	*(mmaps[i].prev_head) = prev_head;
+	printf("after hang2\n");
 
 	/* Re-enable counters */
 	ret=ioctl(fd, PERF_EVENT_IOC_REFRESH, 1);
 
+	printf("after hang3\n");
 	(void) ret;
 
 }
@@ -344,8 +343,8 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 		if(AGGREGATE);
 		else {
         	attr.sample_period=sample_period;
-			attr.sample_type=sample_type;
-			attr.read_format=read_format;
+			attr.sample_type=sample_type_handle;
+			attr.read_format=read_format_handle;
 		}
 	    attr.disabled=1;
 		attr.wakeup_events=1;

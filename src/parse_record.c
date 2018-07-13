@@ -41,6 +41,7 @@ static int handle_struct_read_format(unsigned char *sample,
 
 	int offset=0,i;
 
+	printf("in read_format\n");
 	if (read_format & PERF_FORMAT_GROUP) {
 		long long nr,time_enabled,time_running;
 
@@ -316,7 +317,7 @@ static int dump_raw_ibs_op(unsigned char *data, int size) {
 	return 0;
 }
 
-static int debug=0;
+static int debug=1;
 long long perf_mmap_read( void *our_mmap, int mmap_size,
 			long long prev_head,
 			int sample_type, int read_format, long long reg_mask,
@@ -324,30 +325,49 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 			int quiet, int *events_read,
 			int raw_type, char* file) {
 
+	printf("into parse_record\n");
+
 	struct perf_event_mmap_page *control_page = our_mmap;
 	long long head,offset;
 	int i,size;
 	long long bytesize,prev_head_wrap;
 	FILE *fp;
 
+	printf("into parse_record2\n");
 
 	fp = fopen(file, "a");
+	printf("into parse_record2.48\n");
+
+	if(fp == NULL) {
+		printf("Error opening file to record samples.\n");
+		exit(1);
+	}
 	//fp = stdout;
+	printf("into parse_record2.49\n");
 
 	unsigned char *data;
+	printf("into parse_record2.5\n");
 
 	void *data_mmap=our_mmap+getpagesize();
 
+	printf("into parse_record3\n");
 
-	if (mmap_size==0) return 0;
+
+	if (mmap_size==0) {
+		printf("YEEEE return that zero\n");
+ 		return 0;
+	}
 
 	if (control_page==NULL) {
 		fprintf(stderr,"ERROR mmap page NULL\n");
 		return -1;
 	}
 
+		printf("into parse_record4\n");
+
 	head=control_page->data_head;
 	rmb(); /* Must always follow read of data_head */
+		printf("into parse_record5\n");
 
 	size=head-prev_head;
 
