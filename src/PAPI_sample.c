@@ -278,7 +278,7 @@ int PAPI_sample_start(int * fd) {
     			fprintf(stderr,"Error with PERF_EVENT_IOC_ENABLE "
     					"of group leader: %d %s\n",
     					errno,strerror(errno));
-    			exit(1);
+    			// /exit(1);
      		}
     	}
 
