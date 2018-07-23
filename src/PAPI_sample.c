@@ -46,6 +46,7 @@
 
 #include "parse_record.h"
 #include "PAPI_sample.h"
+#include "char_replace.h"
 
 
 #define MMAP_DATA_SIZE 8
@@ -96,7 +97,7 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 
 	for(i = 0; i < num_maps; i++) {
 		if((*(mmaps[i].fd)) == fd) {
-			//printf("i is %d\n", i);
+	//printf("i is %d\n", i);
 			prev_head = *(mmaps[i].prev_head);
 			our_mmap = mmaps[i].sample_mmap;
 			break;
@@ -146,7 +147,7 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 	long long bytesize;
 
 	bytesize = MMAP_DATA_SIZE*getpagesize();
-	printf("Bytesize %lld\n", bytesize);
+	//printf("Bytesize %lld\n", bytesize);
 
 	data=malloc(bytesize);
 	if (data==NULL) {
@@ -355,8 +356,28 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
     ret = pfm_get_os_event_encoding(EventCode, PFM_PLM3, PFM_OS_PERF_EVENT, &raw);
 
 	if (ret != PFM_SUCCESS) {
-		printf("gen_codes can't get encoding %s\n",  pfm_strerror(ret));
-		exit(1);
+
+        printf("%s\n", EventCode);
+
+        if(strstr( EventCode, "LATENCY") != NULL) {
+
+            attr = capital_latency_event(EventCode, sample_type, read_format,
+                            sample_period);
+            return attr;
+        }
+
+        else if(strstr( EventCode, "latency") != NULL) {
+
+            attr = lower_latency_event(EventCode, sample_type, read_format,
+                            sample_period);
+            return attr;
+
+        }
+
+        else {
+            printf("libpfm can't get encoding for perf_event attribute for the event %s\n",  pfm_strerror(ret));
+		    exit(1);
+        }
 	}
 
 	/* 	Make sure to set the proper sampling paramters for the first event to
@@ -393,6 +414,150 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 	return attr;
 
 }
+
+struct perf_event_attr lower_latency_event(char* EventCode, int sample_type,
+            int read_format, int sample_period) {
+
+    int i = 0;
+    int colon = 0;
+    while(EventCode[i] != '\0') {
+
+        if(EventCode[i] == '.') {
+
+            replace_char(EventCode, '.', ':');
+            break;
+        }
+        i++;
+    }
+
+    /*
+    if (strcmp(string, "") == 0)
+    {
+  // do something
+    }
+    else if (strcmp(string, "xxx") == 0)
+    {
+  // do something else
+    }
+/* more else if clauses */
+    //else /* default: */
+    //{
+    //}
+
+
+}
+
+struct perf_event_attr capital_latency_event(char* EventCode, int sample_type,
+            int read_format, int sample_period) {
+
+    int i = 0;
+    int colon = 0;
+    struct perf_event_attr attr;
+
+    memset(&attr, 0, sizeof(attr));
+
+    while(EventCode[i] != '\0') {
+
+        if(EventCode[i] == '.') {
+
+            replace_char(EventCode, '.', ':');
+            break;
+        }
+        i++;
+    }
+
+    attr.type=PERF_TYPE_RAW;
+    attr.size=sizeof(struct perf_event_attr);
+
+
+	if(AGGREGATE);
+	else {
+       	attr.sample_period=sample_period;
+		attr.sample_type=sample_type_handle;
+		attr.read_format=read_format_handle;
+	}
+
+	attr.disabled=1;
+	attr.wakeup_events=1;
+	attr.pinned=1;
+	attr.precise_ip=0;
+	attr.exclude_kernel=1;
+	attr.exclude_hv=1;
+
+
+
+    if (strcmp(EventCode, "FRONTEND_RETIRED:LATENCY_GE_2") == 0)
+    {
+   	 attr.config = 0x5101c6;
+   	 attr.config1 = 0x400206;
+    }
+    else if (strcmp(EventCode, "FRONTEND_RETIRED:LATENCY_GE_4") == 0)
+    {
+   	 attr.config = 0x5101c6;
+   	 attr.config1 = 0x400406;
+    }
+    else if (strcmp(EventCode, "FRONTEND_RETIRED:LATENCY_GE_8") == 0)
+    {
+   	 attr.config = 0x5101c6;
+   	 attr.config1 = 0x400806;
+    }
+    else if (strcmp(EventCode, "FRONTEND_RETIRED:LATENCY_GE_16") == 0)
+    {
+   	 attr.config = 0x5101c6;
+   	 attr.config1 = 0x401006;
+    }
+    else if (strcmp(EventCode, "FRONTEND_RETIRED:LATENCY_GE_32") == 0)
+    {
+   	 attr.config = 0x5101c6;
+   	 attr.config1 = 0x402006;
+    }
+    else if (strcmp(EventCode, "FRONTEND_RETIRED:LATENCY_GE_64") == 0)
+    {
+   	 attr.config = 0x5101c6;
+   	 attr.config1 = 0x404006;
+    }
+    else if (strcmp(EventCode, "FRONTEND_RETIRED:LATENCY_GE_128") == 0)
+    {
+   	 attr.config = 0x5101c6;
+   	 attr.config1 = 0x408006;
+    }
+    else if (strcmp(EventCode, "FRONTEND_RETIRED:LATENCY_GE_256") == 0)
+    {
+   	 attr.config = 0x5101c6;
+   	 attr.config1 = 0x410006;
+    }
+    else if (strcmp(EventCode, "FRONTEND_RETIRED:LATENCY_GE_512") == 0)
+    {
+   	 attr.config = 0x5101c6;
+   	 attr.config1 = 0x420006;
+    }
+
+    else if (strcmp(EventCode, "FRONTEND_RETIRED:LATENCY_GE_2_BUBBLES_GE_1") == 0)
+    {
+   	 attr.config = 0x5101c6;
+   	 attr.config1 = 0x100206;
+    }
+    else if (strcmp(EventCode, "FRONTEND_RETIRED:LATENCY_GE_2_BUBBLES_GE_2") == 0)
+    {
+   	 attr.config = 0x5101c6;
+   	 attr.config1 = 0x200206;
+    }
+    else if (strcmp(EventCode, "FRONTEND_RETIRED:LATENCY_GE_2_BUBBLES_GE_3") == 0)
+    {
+   	 attr.config = 0x5101c6;
+   	 attr.config1 = 0x300206;
+    }
+    else
+    {
+        printf("Latency event not found! Exiting!\n");
+        exit(1);
+    }
+
+    return attr;
+
+}
+
+
 
 /* 	Old funcition to generate perf_event_attr setup. Hard coded with Skylake
 	events and #defines found in PAPI_sample.h */

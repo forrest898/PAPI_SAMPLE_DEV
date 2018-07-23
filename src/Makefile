@@ -33,10 +33,10 @@ gen_list:	gen_list.o
 
 test_events:	test_events.o PAPI_sample.o instructions_testcode.o \
 				perf_helpers.o test_utils.o parse_record.o \
-				matrix_multiply.o
+				matrix_multiply.o char_replace.o
 				$(CC) -o test_events test_events.o PAPI_sample.o \
 				instructions_testcode.o perf_helpers.o test_utils.o \
-				parse_record.o matrix_multiply.o $(LIBS)
+				parse_record.o matrix_multiply.o char_replace.o $(LIBS)
 
 matrix_mul:	matrix_mul.o
 			$(CC) -o matrix_mul matrix_mul.o matrix_multiply.o $(LIBS)
