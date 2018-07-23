@@ -359,21 +359,12 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 
         printf("%s\n", EventCode);
 
-        if(strstr( EventCode, "LATENCY") != NULL) {
+        if(strcasestr( EventCode, "LATENCY") != NULL) {
 
             attr = capital_latency_event(EventCode, sample_type, read_format,
                             sample_period);
             return attr;
         }
-
-        else if(strstr( EventCode, "latency") != NULL) {
-
-            attr = lower_latency_event(EventCode, sample_type, read_format,
-                            sample_period);
-            return attr;
-
-        }
-
         else {
             printf("libpfm can't get encoding for perf_event attribute for the event %s\n",  pfm_strerror(ret));
 		    exit(1);
@@ -454,10 +445,14 @@ struct perf_event_attr capital_latency_event(char* EventCode, int sample_type,
     int colon = 0;
     struct perf_event_attr attr;
 
+
+    //toupper(EventCode[i]);
+
     memset(&attr, 0, sizeof(attr));
 
     while(EventCode[i] != '\0') {
 
+        EventCode[i] = toupper((unsigned char)EventCode[i]);
         if(EventCode[i] == '.') {
 
             replace_char(EventCode, '.', ':');
@@ -483,8 +478,6 @@ struct perf_event_attr capital_latency_event(char* EventCode, int sample_type,
 	attr.precise_ip=0;
 	attr.exclude_kernel=1;
 	attr.exclude_hv=1;
-
-
 
     if (strcmp(EventCode, "FRONTEND_RETIRED:LATENCY_GE_2") == 0)
     {
@@ -555,186 +548,4 @@ struct perf_event_attr capital_latency_event(char* EventCode, int sample_type,
 
     return attr;
 
-}
-
-
-
-/* 	Old funcition to generate perf_event_attr setup. Hard coded with Skylake
-	events and #defines found in PAPI_sample.h */
-struct perf_event_attr setup_perf(int EventCode, int sample_type,
-                                    int sample_period, int firstEvent) {
-
-    int read_format = PERF_FORMAT_GROUP |
-        PERF_FORMAT_ID |
-        PERF_FORMAT_TOTAL_TIME_ENABLED |
-        PERF_FORMAT_TOTAL_TIME_RUNNING;
-    struct perf_event_attr pe;
-
-    memset(&pe,0,sizeof(struct perf_event_attr));
-
-    pe.type=PERF_TYPE_RAW;
-    pe.size=sizeof(struct perf_event_attr);
-
-    if(firstEvent) {
-
-        pe.sample_period=sample_period;
-		pe.sample_type=sample_type;
-		pe.read_format=read_format;
-	    pe.disabled=1;
-		pe.wakeup_events=1;
-	    pe.pinned=1;
-    }
-	else {
-		pe.sample_type=PERF_SAMPLE_RAW;
-		pe.read_format=PERF_FORMAT_GROUP|PERF_FORMAT_ID;
-	    pe.disabled=0;
-	}
-
-    pe.exclude_kernel=1;
-    pe.exclude_hv=1;
-
-    //pe.precise_ip=1;
-
-  /* Prototype for Skylake machines */
-
-    switch(EventCode) {
-        case	PAPI_BR_INST_RETIRED_ALL_BRANCHES	:
-			pe.config=0x5100c4;
-			break;
-		case	PAPI_BR_INST_RETIRED_CONDITIONAL	:
-			pe.config=0x5101c4;
-			break;
-		case	PAPI_BR_INST_RETIRED_FAR_BRANCH	:
-			pe.config=0x5140c4;
-			break;
-		case	PAPI_BR_INST_RETIRED_NEAR_CALL	:
-			pe.config=0x5102c4;
-			break;
-		case	PAPI_BR_INST_RETIRED_NEAR_RETURN	:
-			pe.config=0x5108c4;
-			break;
-		case	PAPI_BR_INST_RETIRED_NEAR_TAKEN	:
-			pe.config=0x5120c4;
-			break;
-		case	PAPI_BR_MISP_RETIRED_ALL_BRANCHES	:
-			pe.config=0x5100c5;
-			break;
-		case	PAPI_BR_MISP_RETIRED_CONDITIONAL	:
-			pe.config=0x5101c5;
-			break;
-		case	PAPI_BR_MISP_RETIRED_NEAR_CALL	:
-			pe.config=0x5102c5;
-			break;
-		case	PAPI_BR_MISP_RETIRED_NEAR_TAKEN	:
-			pe.config=0x5120c5;
-			break;
-		case	PAPI_FRONTEND_RETIRED_DSB_MISS	:
-			pe.config=0x5101c6;
-			pe.config1=0x11;
-			pe.precise_ip=0;
-			break;
-		case	PAPI_FRONTEND_RETIRED_ITLB_MISS	:
-			pe.config=0x5101c6;
-			pe.config1=0x14;
-			pe.precise_ip=0;
-			break;
-		case	PAPI_FRONTEND_RETIRED_STLB_MISS	:
-			pe.config=0x5101c6;
-			pe.config1=0x15;
-			pe.precise_ip=0;
-			break;
-		case	PAPI_FRONTEND_RETIRED_L1I_MISS	:
-			//pe.precise_ip=1;
-			pe.config=0x5101c6;
-			pe.config1=0x12;
-			pe.precise_ip=0;
-			break;
-		case	PAPI_FRONTEND_RETIRED_L2_MISS	:
-			pe.config=0x5101c6;
-			pe.config1=0x13;
-			pe.precise_ip=0;
-			break;
-		case 	PAPI_FRONTEND_RETIRED_LATENCY_GE_128:
-			pe.config=0x5101c6;
-			pe.config2=0x408006;
-			break;
-		case	PAPI_MEM_INST_RETIRED_STLB_MISS_LOADS	:
-			pe.config=0x5111d0;
-			pe.precise_ip=0;
-			break;
-		case	PAPI_MEM_INST_RETIRED_STLB_MISS_STORES	:
-			pe.config=0x5112d0;
-			break;
-		case	PAPI_MEM_INST_RETIRED_LOCK_LOADS	:
-			pe.config=0x5121d0;
-			break;
-		case	PAPI_MEM_INST_RETIRED_SPLIT_LOADS	:
-			pe.config=0x5141d0;
-			break;
-		case	PAPI_MEM_INST_RETIRED_SPLIT_STORES	:
-			pe.config=0x5142d0;
-			break;
-		case	PAPI_MEM_INST_RETIRED_ALL_LOADS	:
-			pe.config=0x5181d0;
-			break;
-		case	PAPI_MEM_INST_RETIRED_ALL_STORES	:
-			pe.config=0x5182d0;
-			break;
-		case	PAPI_HLE_RETIRED_ABORTED	:
-			pe.config=0x5104c8;
-			break;
-		case	PAPI_INST_RETIRED_TOTAL_CYCLES	:
-			pe.config=0xad101c0;
-			break;
-		case	PAPI_INST_RETIRED_TOTAL_INST	:
-			pe.config=0x5100c0;
-			break;
-		case	PAPI_MEM_LOAD_L3_HIT_RETIRED_XSNP_HIT	:
-			pe.config=0x5102d2;
-			break;
-		case	PAPI_MEM_LOAD_L3_HIT_RETIRED_XSNP_HITM	:
-			pe.config=0x5104d2;
-			break;
-		case	PAPI_MEM_LOAD_L3_HIT_RETIRED_XSNP_MISS	:
-			pe.config=0x5101d2;
-			break;
-		case	PAPI_MEM_LOAD_L3_HIT_RETIRED_XSNP_NONE	:
-			pe.config=0x5108d2;
-			break;
-		case	PAPI_MEM_LOAD_MISC_RETIRED_UC	:
-			pe.config=0x5104d4;
-			break;
-		case	PAPI_MEM_LOAD_RETIRED_FB_HIT	:
-			pe.config=0x5140d1;
-			break;
-		case	PAPI_MEM_LOAD_RETIRED_L1_HIT	:
-			pe.config=0x5101d1;
-			break;
-		case	PAPI_MEM_LOAD_RETIRED_L1_MISS	:
-			pe.config=0x5108d1;
-			break;
-		case	PAPI_MEM_LOAD_RETIRED_L2_HIT	:
-			pe.config=0x5102d1;
-			break;
-		case	PAPI_MEM_LOAD_RETIRED_L2_MISS	:
-			pe.config=0x5110d1;
-			break;
-		case	PAPI_MEM_LOAD_RETIRED_L3_HIT	:
-			pe.config=0x5104d1;
-			break;
-		case	PAPI_MEM_LOAD_RETIRED_L3_MISS	:
-			pe.config=0x5120d1;
-			break;
-		case	PAPI_RTM_RETIRED_ABORTED	:
-			pe.config=0x5104c9;
-			//pe.precise_ip=1;
-			break;
-
-        default:
-            printf("EventCode not found in PEBS/IBS event! Enter a valid code!\n");
-            //return -1;
-            break;
-    }
-
-    return pe;
 }

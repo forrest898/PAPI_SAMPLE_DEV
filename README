@@ -116,3 +116,8 @@ so quickly.... HA! Anyways, over the weekend I read that only certain actions
 can be performed in a signal handler. The handler currently in effect is
 technically undefined behavior but seems to be performing fine. Ask Vince about
 this. (it was his code that originally had the behavior)
+
+7/23
+Much of my efforts last week were poured into the paper for the ESPT workshop.
+I did figure out how to do latency events last week, which I have now worked
+into the code.

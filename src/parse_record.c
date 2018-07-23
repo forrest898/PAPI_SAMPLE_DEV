@@ -317,7 +317,7 @@ static int dump_raw_ibs_op(unsigned char *data, int size) {
 	return 0;
 }
 
-static int debug=1;
+static int debug=0;
 long long perf_mmap_read( void *our_mmap, int mmap_size,
 			long long prev_head,
 			int sample_type, int read_format, long long reg_mask,
