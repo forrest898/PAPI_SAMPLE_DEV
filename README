@@ -121,3 +121,11 @@ this. (it was his code that originally had the behavior)
 Much of my efforts last week were poured into the paper for the ESPT workshop.
 I did figure out how to do latency events last week, which I have now worked
 into the code.
+
+7/24
+Got linpack going on the lab SKYLAKE machine. It was a little tricky to specify
+the statically linked libraries in the exact format mpicc wants them. Tomorrow,
+test all events on SKYLAKE to affirm they work in different machines than just
+mine. In addition, now that we have linpack for SKYLAKE statically compiled,
+porting it to the Broadwell and Haswell machines should not be too challenging.
+I can then beginning testing for those sets of events.
