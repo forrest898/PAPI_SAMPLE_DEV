@@ -129,3 +129,7 @@ test all events on SKYLAKE to affirm they work in different machines than just
 mine. In addition, now that we have linpack for SKYLAKE statically compiled,
 porting it to the Broadwell and Haswell machines should not be too challenging.
 I can then beginning testing for those sets of events.
+
+7/25
+Prepped a suite to test other architectures. Still trying to figure
+out/remember how to use SLURM for the Broadwell-EP machine.
