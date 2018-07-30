@@ -131,7 +131,7 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 
 /* Base API for simple write-out results */
 int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
-                        int sample_type, int sample_period, char* filename) {
+                        int sample_type, int sample_period, char* filename, int PIP) {
 
     int i, firstEvent, ret;
     int mmap_pages=1+MMAP_DATA_SIZE;
@@ -210,7 +210,7 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 
 		memset(&pe,0,sizeof(struct perf_event_attr));
        //pe = setup_perf(EventCodes[i], sample_type, sample_period, firstEvent);
-		pe = new_setup_perf(EventCodes, sample_type, sample_period, firstEvent);
+		pe = new_setup_perf(EventCodes, sample_type, sample_period, firstEvent, PIP);
 
 			if(DEBUG) {
 				printf("Value of i is %d\n \
@@ -333,7 +333,7 @@ int PAPI_sample_stop(int * fd, int NumEvents) {
 /*	Function which returns a perf_event_attr that is generated via a call
 	to libpfm */
 struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
-                                    int sample_period, int firstEvent)  {
+                                    int sample_period, int firstEvent, int PIP)  {
 
 	int ret;
 	int read_format = PERF_FORMAT_GROUP |
@@ -383,7 +383,7 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 	    attr.disabled=1;
 		attr.wakeup_events=1;
 	    attr.pinned=1;
-		attr.precise_ip=0;
+		attr.precise_ip=PIP;
 		attr.exclude_kernel=1;
 		attr.exclude_hv=1;
 		//attr.inherit=1;
