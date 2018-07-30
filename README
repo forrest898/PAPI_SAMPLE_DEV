@@ -133,3 +133,11 @@ I can then beginning testing for those sets of events.
 7/25
 Prepped a suite to test other architectures. Still trying to figure
 out/remember how to use SLURM for the Broadwell-EP machine.
+
+7/30 
+Finally solved my problem with slurm. Needed to use the --mpi=pmi2
+flag in order to tell SLURM it's an MPI job. Now, that I resolved this
+issue, I broke PAPI_Sample horribly for Broadwell. I am having trouble 
+tracking the root of the problem currently, but the file descriptors
+are not being initialized properly for Broadwell. This has been a 
+frustrating endevor all around today...
