@@ -141,3 +141,16 @@ issue, I broke PAPI_Sample horribly for Broadwell. I am having trouble
 tracking the root of the problem currently, but the file descriptors
 are not being initialized properly for Broadwell. This has been a 
 frustrating endevor all around today...
+
+7/31
+No longer using SLURM. I was having trouble running jobs on Broadwell 
+with mpirun. I fixed the problem after figuring out I was using a 
+the include files from openmpi, but compiling with mpich. After
+being able to run jobs on Broadwell, my test script would eventually 
+hang for certain events. I discovered that "fprintf" was calling malloc
+internally in order to expand the sample logging file when the first sample
+is created. This would cause a race condition with the low_level_lock.s code.
+The error has been solved by printing a test line into the file when it is 
+created. It seems the jobs now run flawlessly on the Haswell-EP (which
+was suffering the same issue). More detailed test results to be pushed
+to the static-linpack-testing repo.
