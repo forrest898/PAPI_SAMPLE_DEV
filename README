@@ -134,23 +134,34 @@ I can then beginning testing for those sets of events.
 Prepped a suite to test other architectures. Still trying to figure
 out/remember how to use SLURM for the Broadwell-EP machine.
 
-7/30 
+7/30
 Finally solved my problem with slurm. Needed to use the --mpi=pmi2
 flag in order to tell SLURM it's an MPI job. Now, that I resolved this
-issue, I broke PAPI_Sample horribly for Broadwell. I am having trouble 
+issue, I broke PAPI_Sample horribly for Broadwell. I am having trouble
 tracking the root of the problem currently, but the file descriptors
-are not being initialized properly for Broadwell. This has been a 
+are not being initialized properly for Broadwell. This has been a
 frustrating endevor all around today...
 
 7/31
-No longer using SLURM. I was having trouble running jobs on Broadwell 
-with mpirun. I fixed the problem after figuring out I was using a 
+No longer using SLURM. I was having trouble running jobs on Broadwell
+with mpirun. I fixed the problem after figuring out I was using a
 the include files from openmpi, but compiling with mpich. After
-being able to run jobs on Broadwell, my test script would eventually 
+being able to run jobs on Broadwell, my test script would eventually
 hang for certain events. I discovered that "fprintf" was calling malloc
 internally in order to expand the sample logging file when the first sample
 is created. This would cause a race condition with the low_level_lock.s code.
-The error has been solved by printing a test line into the file when it is 
+The error has been solved by printing a test line into the file when it is
 created. It seems the jobs now run flawlessly on the Haswell-EP (which
 was suffering the same issue). More detailed test results to be pushed
 to the static-linpack-testing repo.
+
+8/2
+Yesterday, I discovered the MEM_TRANS_RETIRED:LATENCY_ABOVE_THRESHOLD event
+only works when precise_ip is set to 2. This led me to do more tests because
+the actual counter value for MEM_TRANS_RETIRED:LATENCY_ABOVE_THRESHOLD seemed
+wrong. (It would jump from 0 to 2*10^14). Upon further investigation, it
+appears the counters are no accurately read until precise_ip is set to 0. All
+other metrics like instruction pointer, sample id, cpu id, etc seem to be in
+order, but the actual value of the counter is lost. The results have been
+documented using the test_events program, and they have been stored in the
+static_linpack_testing repo under PIP_RESULTS.
