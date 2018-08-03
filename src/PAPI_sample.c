@@ -88,12 +88,15 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 	int fd = info->si_fd;
 
 	long long prev_head;
-
+    //long long start_cycle, end_cycle;
 	//printf("Handler!\n");
 	/* Disable counters in order to perform MMAP read */
 	ret=ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
 	//if(events[(fd-3)].sample_mmap == NULL) {	printf("SHIT\n");}
 	//printf("Interupt with file handle %d\n", fd);
+
+    //start_cycle = PAPI_get_real_usec();
+
 
 	for(i = 0; i < num_maps; i++) {
 		if((*(mmaps[i].fd)) == fd) {
@@ -122,6 +125,9 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 
 	*(mmaps[i].prev_head) = prev_head;
 
+    //end_cycle = PAPI_get_real_usec();
+
+   // printf("Real time to use parse_record: %lld\n", (end_cycle-start_cycle) );
 	/* Re-enable counters */
 	ret=ioctl(fd, PERF_EVENT_IOC_REFRESH, 1);
 
@@ -168,19 +174,25 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 		printf("Could not open file for logging\n");
 		exit(1);
 	}
+    fprintf(fp,"This is line is so malloc hopefully doesnt cause a dead lock\n");
 
 	/* Set global variable to be used by our signal handler */
 	output_file = filename;
 
 	NUM_CORES = get_nprocs();
 	if(!(NUM_CORES > 0))	{
-		printf("PANIC: SYSTEM DOESNT KNOW ABOUT ITS OWN CPU\n");
+		printf("SYSTEM DOESNT KNOW ABOUT ITS OWN CPU\n");
 		return -1;
 	}
 
 	/* Allocate as many file descriptors as events sampled */
     fds = (int *)malloc(sizeof(int)*NumEvents*NUM_CORES);
 	heads = (long long *)calloc(NumEvents*NUM_CORES, sizeof(long long));
+
+    if(!fds || !heads) {
+        printf("Allocation for sampling resources failed! Exiting!");
+        exit(1);
+    }
 
 	ret = pfm_initialize();
     if (ret != PFM_SUCCESS)
@@ -211,6 +223,7 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 		memset(&pe,0,sizeof(struct perf_event_attr));
        //pe = setup_perf(EventCodes[i], sample_type, sample_period, firstEvent);
 		pe = new_setup_perf(EventCodes, sample_type, sample_period, firstEvent);
+
 
 			if(DEBUG) {
 				printf("Value of i is %d\n \
@@ -244,6 +257,11 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
 		mmaps[i].sample_mmap = mmap(NULL, mmap_pages*getpagesize(),
 									PROT_READ | PROT_WRITE, MAP_SHARED,
 									fds[i], 0);
+
+        if(mmaps[i].sample_mmap  == MAP_FAILED) {
+            printf("MMAP could not be allocated for requested event! Exiting!\n");
+            exit(1);
+        }
 		mmaps[i].fd = &fds[i];
 		mmaps[i].prev_head = &heads[i];
 	//	printf("ADDR MAP %p ... VALUE FD %d ... ADDR HEAD %p\n",
@@ -357,7 +375,7 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 
 	if (ret != PFM_SUCCESS) {
 
-        printf("%s\n", EventCode);
+        //printf("%s\n", EventCode);
 
         if(strcasestr( EventCode, "LATENCY") != NULL) {
 

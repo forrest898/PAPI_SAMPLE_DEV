@@ -46,14 +46,14 @@ int main(int argc, char** argv) {
 	int ret, conv, i;
 	int * fds;
 	char *ev;
-	char *filename2 = "wowie";
+	char *filename2 = "PIP_2_SAMPLE_10_";
 	char *br = "BR_";
 	FILE* log;
 	//void **mmaps;
 	int mmap_pages = MMAP_DATA_SIZE + 1;
 	PAPI_hw_info_t* hwinfo;
 
-	if(argc != 3) {
+	if(argc != 2) {
 		printf("Please pass the req'd args\n");
 		exit(1);
 	}
@@ -62,19 +62,11 @@ int main(int argc, char** argv) {
 	size_t len2 = strlen(argv[1]);
 
 	char* filename = malloc(len + len2 + 1 ); /* one for extra char, one for trailing zero */
-    strcpy(filename, filename2);
-	if(len2 == 1) {
-    	filename[len] = argv[1][0];
-    	filename[len + 1] = '\0';
-	}
-	else {
-		filename = malloc(len + 1 + 1 ); /* one for extra char, one for trailing zero */
-    	strcpy(filename, filename2);
-    	filename[len] = argv[1][0];
-		filename[len +1] = argv[1][1];
-    	filename[len + 2] = '\0';
-	}
-
+    for(i = 0; i < len; i++)
+		filename[i] = filename2[i];
+	for(i = len; i < (len + len2); i++)
+		filename[i] = argv[1][i-len];
+	filename[i] = '\0';
 	PAPI_library_init(PAPI_VER_CURRENT);
 
 	/*
@@ -103,10 +95,10 @@ int main(int argc, char** argv) {
 	//hwinfo = PAPI_get_hardware_info();
 	//printf("0x%x\n", hwinfo->cpuid_model);
 
-	ev = argv[2];
+	ev = argv[1];
 	printf("%s\n", ev);
 
-	if(strstr(argv[2], br) != NULL) {
+	if(strstr(argv[1], br) != NULL) {
 		//printf("someone's looking fabulous\n");
 		sample_type |= PERF_SAMPLE_BRANCH_STACK;
 	}
@@ -116,7 +108,7 @@ int main(int argc, char** argv) {
 	//ev[1] = 36;
 
 	// initialize sampling
-	fds = PAPI_sample_init(1, ev, 1, sample_type, 10000, filename);
+	fds = PAPI_sample_init(1, ev, 1, sample_type, 1000000, filename);
 	if(ret != PAPI_OK) {
 		printf("PANIC1\n");
 		//exit(1);
