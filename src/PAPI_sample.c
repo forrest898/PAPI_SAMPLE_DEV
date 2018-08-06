@@ -48,6 +48,9 @@
 #include "PAPI_sample.h"
 #include "char_replace.h"
 
+#if defined(__x86_64__) || defined(__i386__) ||defined(__arm__)
+#include <asm/perf_regs.h>
+#endif
 
 #define MMAP_DATA_SIZE 8
 #define DEBUG 0
@@ -62,6 +65,7 @@ long long * heads;
 unsigned char * data;
 
 long long prev_head = 0;
+long long sample_regs = 0;
 
 char *output_file;
 void *our_mmap;
@@ -74,6 +78,7 @@ int read_format_handle = PERF_FORMAT_GROUP |
    	PERF_FORMAT_ID |
     PERF_FORMAT_TOTAL_TIME_ENABLED |
     PERF_FORMAT_TOTAL_TIME_RUNNING;
+
 int sample_type_handle=PERF_SAMPLE_IP | PERF_SAMPLE_READ | PERF_SAMPLE_CPU;
 
 
@@ -115,7 +120,7 @@ static void PAPI_sample_handler(int signum, siginfo_t *info, void *uc) {
 	/* Parse MMAP and read out our sampled values*/
 	prev_head=perf_mmap_read(our_mmap,MMAP_DATA_SIZE,prev_head,
 		sample_type_handle,read_format_handle,
-		0, /* reg_mask */
+		sample_regs, /* reg_mask */
 		NULL, /*validate */
 		quiet,
 		NULL, /* events read */
@@ -149,8 +154,11 @@ int * PAPI_sample_init(int Eventset, char* EventCodes, int NumEvents,
     struct perf_event_attr pe;
     struct sigaction sa;
     char test_string[]="Testing Intel PEBS support...";
-	//struct mmap_info mmaps[16];
+	//struct mmap_info mmaps[16]
 	long long bytesize;
+
+    sample_type_handle = sample_type;
+    //read_format_handle = read_format;
 
 	bytesize = MMAP_DATA_SIZE*getpagesize();
 	//printf("Bytesize %lld\n", bytesize);
@@ -370,7 +378,32 @@ struct perf_event_attr new_setup_perf(char* EventCode, int sample_type,
 		error */
  	raw.attr = &attr;
 
-	/* Sets up the perf_event_attr */
+    attr.size = sizeof(struct perf_event_attr);
+
+    if(sample_type & PERF_SAMPLE_REGS_INTR) {
+        #if defined(__i386__) || defined (__x86_64__)
+
+	       /* Bitfield saying which registers we want */
+	       attr.sample_regs_intr=(1ULL<<PERF_REG_X86_64_MAX)-1;
+
+	/* DS, ES, FS, and GS not valid on x86_64 */
+	/* see  perf_reg_validate() in arch/x86/kernel/perf_regs.c */
+	       attr.sample_regs_intr&=~(1ULL<<PERF_REG_X86_DS);
+	       attr.sample_regs_intr&=~(1ULL<<PERF_REG_X86_ES);
+	       attr.sample_regs_intr&=~(1ULL<<PERF_REG_X86_FS);
+	       attr.sample_regs_intr&=~(1ULL<<PERF_REG_X86_GS);
+
+
+//	printf("%llx %d\n",pe.sample_regs_user,PERF_REG_X86_DS);
+
+        #else
+	       attr.sample_regs_intr=1;
+        #endif
+        sample_regs = attr.sample_regs_intr;
+
+    }
+
+    /* Sets up the perf_event_attr */
     ret = pfm_get_os_event_encoding(EventCode, PFM_PLM3, PFM_OS_PERF_EVENT, &raw);
 
 	if (ret != PFM_SUCCESS) {

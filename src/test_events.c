@@ -38,7 +38,7 @@ int sample_type=PERF_SAMPLE_IP | PERF_SAMPLE_TID | PERF_SAMPLE_TIME |
 		PERF_SAMPLE_ADDR | PERF_SAMPLE_READ | PERF_SAMPLE_CALLCHAIN |
 		PERF_SAMPLE_ID | PERF_SAMPLE_CPU | PERF_SAMPLE_PERIOD |
 		PERF_SAMPLE_STREAM_ID | PERF_SAMPLE_RAW |
-		PERF_SAMPLE_DATA_SRC ;
+		PERF_SAMPLE_DATA_SRC | PERF_SAMPLE_REGS_INTR;
 
 
 int main(int argc, char** argv) {
@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
 		//exit(1);
 	}
 
-	for(i = 0; i < 5; i++) {
+	for(i = 0; i < 3; i++) {
 		naive_matrix_multiply(1);
 	}
 

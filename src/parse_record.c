@@ -150,26 +150,26 @@ static char reg_names[1][8]={"NONE!"};
 
 
 static int print_regs(int quiet,long long abi,long long reg_mask,
-		unsigned char *data) {
+		unsigned char *data, FILE * fp) {
 
 	int return_offset=0;
 	int num_regs=NUM_REGS;
 	int i;
 	unsigned long long reg_value;
 
-	if (!quiet) printf("\t\tReg mask %llx\n",reg_mask);
+	if (!quiet) fprintf(fp, "\t\tReg mask %llx\n",reg_mask);
 	for(i=0;i<64;i++) {
 		if (reg_mask&1ULL<<i) {
 			if (!quiet) {
 				memcpy(&reg_value,&data[return_offset],8);
 				if (i<num_regs) {
-					printf("\t\t%s : ",reg_names[i]);
+					fprintf(fp, "\t\t%s : ",reg_names[i]);
 				}
 				else {
-					printf("\t\t??? : ");
+					fprintf(fp, "\t\t??? : ");
 				}
 
-				printf("%llx\n",reg_value);
+				fprintf(fp, "%llx\n",reg_value);
 			}
 			return_offset+=8;
 		}
@@ -894,7 +894,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 				offset+=8;
 
 				offset+=print_regs(quiet,abi,reg_mask,
-						&data[offset]);
+						&data[offset], fp);
 
 				if (!quiet) fprintf(fp, "\n");
 			}
@@ -913,7 +913,7 @@ long long perf_mmap_read( void *our_mmap, int mmap_size,
 				offset+=8;
 
 				offset+=print_regs(quiet,abi,reg_mask,
-						&data[offset]);
+						&data[offset], fp);
 
 				if (!quiet) fprintf(fp, "\n");
 			}
